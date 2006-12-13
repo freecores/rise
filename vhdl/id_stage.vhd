@@ -119,11 +119,11 @@ begin  -- id_stage_rtl
   
   pc: process( if_id_register )
   begin
-     if reset = '0' then
-       id_ex_register_next.pc <= RESET_PC_VALUE;
-     else
-       id_ex_register_next.pc <= if_id_register.pc;
-     end if;
+    if reset = '0' then
+      id_ex_register_next.pc <= RESET_PC_VALUE;
+    else
+      id_ex_register_next.pc <= if_id_register.pc;
+    end if;
   end process;
   
   rx_decode_and_fetch: process (reset, if_id_register, id_ex_register_next)
@@ -152,7 +152,7 @@ begin  -- id_stage_rtl
       set_reg_lock <= '0';
     end if;
   end process;
-      
+  
   ry_decode_and_fetch: process (reset, if_id_register, id_ex_register_next)
   begin
     -- make sure we don't synthesize a latch for ry_addr
