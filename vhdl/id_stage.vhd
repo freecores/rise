@@ -48,9 +48,25 @@ architecture id_stage_rtl of id_stage is
   signal id_ex_register_int     : ID_EX_REGISTER_T;
   signal id_ex_register_next    : ID_EX_REGISTER_T;
   
+  function opcode_modifies_rx( opcode: in OPCODE_T ) return std_logic is
+    variable modifies : std_logic;
+  begin
+    case opcode is
+      when OPCODE_LD_IMM => modifies := '1';
+      when others => modifies := '0';
+    end case;
+    return modifies;
+  end;
+  
+  function register_is_ready( reg_addr: in REGISTER_ADDR_T ) return std_logic is
+    variable index : integer range 0 to REGISTER_COUNT - 1;
+  begin
+    
+  end;
+  
 begin  -- id_stage_rtl
 
---  id_ex_register        <= id_ex_register_int;
+  id_ex_register        <= id_ex_register_int;
   
 --  process (clk, reset)
 --  begin  -- process
@@ -62,4 +78,106 @@ begin  -- id_stage_rtl
 --    end if;
 --  end process;  
 
+  process (clk, reset ) 
+  begin
+    if reset = '0' then
+      id_ex_register_int.sr <= RESET_SR_VALUE;
+      id_ex_register_int.pc <= RESET_PC_VALUE;
+      id_ex_register_int.opcode <= OPCODE_NOP;
+      id_ex_register_int.cond <= COND_NONE;
+      id_ex_register_int.rX_addr <= ( others => '0' );
+      id_ex_register_int.rX <= ( others => '0' );
+      id_ex_register_int.rY <= ( others => '0' );
+      id_ex_register_int.rZ <= ( others => '0' );
+      id_ex_register_int.immediate <= ( others => '0' );
+    elsif clk'event and clk = '1' then 
+      id_ex_register_int <= id_ex_register_next;
+    end if;
+  end process;
+  
+  opc_extender: process (clk, reset )
+  begin
+    if reset = '0' then
+      id_ex_register_next.opcode <= OPCODE_NOP;
+    elsif if_id_register.ir(15) = '1' then
+      id_ex_register_next.opcode <= if_id_register.ir( 15 downto 13 ) & "00";
+    else
+      id_ex_register_next.opcode <= if_id_register.ir( 15 downto 11 );
+    end if;
+  end process;
+  
+  cond_decode: process (clk, reset )
+  begin
+    if reset = '0' then 
+      id_ex_register_next.cond <= COND_NONE;
+    elsif if_id_register.ir(15) = '1' then
+      id_ex_register_next.cond <= if_id_register.ir( 15 downto 13 );
+    else
+      id_ex_register_next.cond <= if_id_register.ir( 10 downto 8 );
+    end if;
+  end process;
+  
+  pc: process( if_id_register )
+  begin
+     if reset = '0' then
+       id_ex_register_next.pc <= RESET_PC_VALUE;
+     else
+       id_ex_register_next.pc <= if_id_register.pc;
+     end if;
+  end process;
+  
+  rx_decode_and_fetch: process (reset, if_id_register, id_ex_register_next)
+  begin
+    -- make sure we don't synthesize a latch for rx_addr
+    rx_addr <= ( others => '0' );
+    
+    if reset = '0' then
+      id_ex_register_next.rX <= ( others => '0' );
+      id_ex_register_next.rX_addr <= ( others => '0' );
+    elsif id_ex_register_next.opcode = OPCODE_LD_IMM then
+      rx_addr <= if_id_register.ir( 11 downto 8 );
+      id_ex_register_next.rX <= rx;
+      id_ex_register_next.rX_addr <= if_id_register.ir( 11 downto 8 );
+    else
+      rx_addr <= if_id_register.ir( 7 downto 4 );
+      id_ex_register_next.rX <= rx;
+      id_ex_register_next.rX_addr <= if_id_register.ir( 7 downto 4 );
+    end if;
+    
+    if opcode_modifies_rx( id_ex_register_next.opcode ) = '1' then
+      lock_reg_addr <= id_ex_register_next.rX_addr;
+      set_reg_lock <= '1';
+    else
+      lock_reg_addr <= ( others => '0' );
+      set_reg_lock <= '0';
+    end if;
+  end process;
+      
+  ry_decode_and_fetch: process (reset, if_id_register, id_ex_register_next)
+  begin
+    -- make sure we don't synthesize a latch for ry_addr
+    ry_addr <= ( others => '0' );
+    
+    if reset = '0' then
+      id_ex_register_next.rY <= ( others => '0' );
+    else
+      ry_addr <= if_id_register.ir( 3 downto 0 );
+      id_ex_register_next.rZ <= rz;
+    end if;
+  end process;
+  
+  rz_decode_and_fetch: process (reset, if_id_register, id_ex_register_next)
+  begin
+    -- make sure we don't synthesize a latch for rz_addr
+    rz_addr <= ( others => '0' );
+    
+    if reset = '0' then
+      id_ex_register_next.rZ <= ( others => '0' );
+    else
+      -- only the lower 2-bits of rz are encoded in the instruction
+      rz_addr <= "00" & if_id_register.ir( 9 downto 8 );
+      id_ex_register_next.rZ <= rz;
+    end if;
+  end process;
+  
 end id_stage_rtl;
