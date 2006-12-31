@@ -53,10 +53,10 @@ architecture behavior of tb_id_stage_unit_vhd is
 
   signal stall_in       : std_logic     := '0';
   signal clear_in       : std_logic     := '0';
-  signal rx             : REGISTER_T    := (others => '0');
-  signal ry             : REGISTER_T    := (others => '0');
-  signal rz             : REGISTER_T    := (others => '0');
-  signal sr             : SR_REGISTER_T := (others => '0');
+  signal rx             : REGISTER_T;
+  signal ry             : REGISTER_T;
+  signal rz             : REGISTER_T;
+  signal sr             : SR_REGISTER_T;
   signal lock_register  : LOCK_REGISTER_T;
   --Outputs
   signal id_ex_register : ID_EX_REGISTER_T;
@@ -67,6 +67,14 @@ architecture behavior of tb_id_stage_unit_vhd is
   signal lock_reg_addr  : std_logic_vector(REGISTER_ADDR_WIDTH - 1 downto 0);
   signal stall_out      : std_logic;
 
+  constant TB_RX_ADDR_TEST_VALUE : REGISTER_ADDR_T := x"1";
+  constant TB_RX_TEST_VALUE : REGISTER_T := x"0001";
+  constant TB_RY_TEST_VALUE : REGISTER_T := x"0002";
+  constant TB_RZ_TEST_VALUE : REGISTER_T := x"0003";
+  constant TB_SR_TEST_VALUE : SR_REGISTER_T := x"A55A";
+  constant TB_PC_TEST_VALUE : SR_REGISTER_T := x"1234";
+  
+  constant TB_CLOCK : time := 20 ns;
 begin
 
   -- instantiate the Unit Under Test (UUT)
@@ -93,9 +101,9 @@ begin
   cg : process
   begin
     clk <= '0';
-    wait for 10 ns;
+    wait for TB_CLOCK/2;
     clk <= '1';
-    wait for 10 ns;
+    wait for TB_CLOCK/2;
   end process;
 
   tb : process
@@ -104,10 +112,35 @@ begin
     wait for 100 ns;
     reset <= '1';
 
-    -- stimulus 
-    if_id_register.pc <= x"1234";
-    if_id_register.ir <= "100"& "0" & "0001" & x"55";
+    -- test case: basic functionallity
+    if_id_register.pc <= TB_PC_TEST_VALUE;
+    sr <= TB_SR_TEST_VALUE;
+    rx <= TB_RX_TEST_VALUE;
+    ry <= TB_RY_TEST_VALUE;
+    rz <= TB_RZ_TEST_VALUE;
+    
+    wait for TB_CLOCK;
+    
+    -- test case: OPCODE_LD_IMM 
+    if_id_register.ir <= "100"& "0" & TB_RX_ADDR_TEST_VALUE & x"55";
+    wait for TB_CLOCK;
+    assert id_ex_register.opcode = OPCODE_LD_IMM;
+    assert id_ex_register.immediate = x"0055";
+    assert id_ex_register.cond = COND_UNCONDITIONAL;
+    assert rx_addr = TB_RX_ADDR_TEST_VALUE;
+    assert id_ex_register.rX_addr = TB_RX_ADDR_TEST_VALUE;
+    assert id_ex_register.rX = TB_RX_TEST_VALUE;
 
+    -- test case: OPCODE_LD_IMM_HB
+    if_id_register.ir <= "100"& "1" & TB_RX_ADDR_TEST_VALUE & x"55";
+    wait for TB_CLOCK;
+    assert id_ex_register.opcode = OPCODE_LD_IMM_HB;
+    assert id_ex_register.immediate = x"5500";
+    assert id_ex_register.cond = COND_UNCONDITIONAL;
+    assert rx_addr = TB_RX_ADDR_TEST_VALUE;
+    assert id_ex_register.rX_addr = TB_RX_ADDR_TEST_VALUE;
+    assert id_ex_register.rX = TB_RX_TEST_VALUE;
+    
     wait;                               -- will wait forever
   end process;
 
