@@ -61,7 +61,7 @@ architecture id_stage_rtl of id_stage is
   function register_is_ready( reg_addr: in REGISTER_ADDR_T ) return std_logic is
     variable index : integer range 0 to REGISTER_COUNT - 1;
   begin
-    
+    return '1';
   end;
   
 begin  -- id_stage_rtl
@@ -95,12 +95,19 @@ begin  -- id_stage_rtl
     end if;
   end process;
   
+  -- The opc_extender decodes the two different formats used for the opcodes
+  -- in the instruction set into a single 5-bit opcode format.
   opc_extender: process (clk, reset )
   begin
     if reset = '0' then
       id_ex_register_next.opcode <= OPCODE_NOP;
+      -- decodes: OPCODE_LD_IMM, OPCODE_LD_IMM_HB
+    elsif if_id_register.ir( 15 downto 13 ) = "100" then
+      id_ex_register_next.opcode <= if_id_register.ir( 15 downto 13 ) & if_id_register.ir( 12 ) & "0";
+      -- decodes: OPCODE_LD_DISP, OPCODE_LD_DISP_MS, OPCODE_ST_DISP
     elsif if_id_register.ir(15) = '1' then
       id_ex_register_next.opcode <= if_id_register.ir( 15 downto 13 ) & "00";
+      -- decodes: OPCODE_XXX
     else
       id_ex_register_next.opcode <= if_id_register.ir( 15 downto 11 );
     end if;
@@ -110,8 +117,13 @@ begin  -- id_stage_rtl
   begin
     if reset = '0' then 
       id_ex_register_next.cond <= COND_NONE;
+      -- decodes: OPCODE_LD_IMM, OPCODE_LD_IMM_HB
+    elsif if_id_register.ir( 15 downto 13 ) = "100" then
+      id_ex_register_next.cond <= COND_UNCONDITIONAL;
+      -- decodes: OPCODE_LD_DISP, OPCODE_LD_DISP_MS, OPCODE_ST_DISP      
     elsif if_id_register.ir(15) = '1' then
       id_ex_register_next.cond <= if_id_register.ir( 15 downto 13 );
+      -- decodes: OPCODE_XXX
     else
       id_ex_register_next.cond <= if_id_register.ir( 10 downto 8 );
     end if;
@@ -134,7 +146,8 @@ begin  -- id_stage_rtl
     if reset = '0' then
       id_ex_register_next.rX <= ( others => '0' );
       id_ex_register_next.rX_addr <= ( others => '0' );
-    elsif id_ex_register_next.opcode = OPCODE_LD_IMM then
+    elsif id_ex_register_next.opcode = OPCODE_LD_IMM or 
+      id_ex_register_next.opcode = OPCODE_LD_IMM_HB then
       rx_addr <= if_id_register.ir( 11 downto 8 );
       id_ex_register_next.rX <= rx;
       id_ex_register_next.rX_addr <= if_id_register.ir( 11 downto 8 );
@@ -178,6 +191,25 @@ begin  -- id_stage_rtl
       rz_addr <= "00" & if_id_register.ir( 9 downto 8 );
       id_ex_register_next.rZ <= rz;
     end if;
+  end process;
+  
+  -- The immediate fetch process checks for all opcodes needing constants
+  -- and decides which immediate format was present. If the instruction
+  -- does not include an immediate value the result is undefined and must
+  -- not be used.
+  imm_fetch: process (reset, if_id_register, id_ex_register_next)
+  begin
+    case id_ex_register_next.opcode is
+      -- The immediate values holds the upper 8 bits of a 16 bit value.
+      when OPCODE_LD_IMM_HB => 
+        id_ex_register_next.immediate <= if_id_register.ir( 7 downto 0 ) & x"00";
+        -- The immediate values holds the lower 8 bits of a 16 bit value. 
+      when OPCODE_LD_IMM => 
+        id_ex_register_next.immediate <= x"00" & if_id_register.ir( 7 downto 0 );
+        -- Default format holds the lower 4 bits of a 16 bit value.
+      when others =>
+        id_ex_register_next.immediate <= x"000" & if_id_register.ir( 3 downto 0 );
+    end case;
   end process;
   
 end id_stage_rtl;
