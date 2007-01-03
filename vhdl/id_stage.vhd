@@ -8,9 +8,8 @@
 -------------------------------------------------------------------------------
 
 library IEEE;
-use IEEE.STD_LOGIC_1164.all;
-use IEEE.STD_LOGIC_ARITH.all;
-
+use IEEE.std_logic_1164.all;
+use IEEE.numeric_std.all;
 use WORK.RISE_PACK.all;
 
 
@@ -45,6 +44,9 @@ end id_stage;
 
 architecture id_stage_rtl of id_stage is
 
+  signal rx_addr_int : REGISTER_ADDR_T;
+  signal ry_addr_int : REGISTER_ADDR_T;
+  signal rz_addr_int : REGISTER_ADDR_T;
   signal id_ex_register_int     : ID_EX_REGISTER_T;
   signal id_ex_register_next    : ID_EX_REGISTER_T;
   
@@ -52,20 +54,20 @@ architecture id_stage_rtl of id_stage is
     variable modifies : std_logic;
   begin
     case opcode is
-      when OPCODE_LD_IMM => modifies := '1';
-      when others => modifies := '0';
+      when OPCODE_JMP => modifies := '0';
+      when OPCODE_TST => modifies := '0';
+      when OPCODE_NOP => modifies := '0';
+      when OPCODE_ST_DISP => modifies := '0';
+      when others => modifies := '1';
     end case;
     return modifies;
   end;
   
-  function register_is_ready( reg_addr: in REGISTER_ADDR_T ) return std_logic is
-    variable index : integer range 0 to REGISTER_COUNT - 1;
-  begin
-    return '1';
-  end;
-  
 begin  -- id_stage_rtl
 
+  rx_addr <= rx_addr_int;
+  ry_addr <= ry_addr_int;
+  rz_addr <= rz_addr_int;
   id_ex_register        <= id_ex_register_int;
   
 --  process (clk, reset)
@@ -97,8 +99,8 @@ begin  -- id_stage_rtl
   
   -- The opc_extender decodes the two different formats used for the opcodes
   -- in the instruction set into a single 5-bit opcode format.
-  opc_extender: process (clk, reset )
-  begin
+  opc_extender: process ( clk, reset, if_id_register )
+  begin 
     if reset = '0' then
       id_ex_register_next.opcode <= OPCODE_NOP;
       -- decodes: OPCODE_LD_IMM, OPCODE_LD_IMM_HB
@@ -113,7 +115,7 @@ begin  -- id_stage_rtl
     end if;
   end process;
   
-  cond_decode: process (clk, reset )
+  cond_decode: process ( clk, reset, if_id_register )
   begin
     if reset = '0' then 
       id_ex_register_next.cond <= COND_NONE;
@@ -122,14 +124,14 @@ begin  -- id_stage_rtl
       id_ex_register_next.cond <= COND_UNCONDITIONAL;
       -- decodes: OPCODE_LD_DISP, OPCODE_LD_DISP_MS, OPCODE_ST_DISP      
     elsif if_id_register.ir(15) = '1' then
-      id_ex_register_next.cond <= if_id_register.ir( 15 downto 13 );
+      id_ex_register_next.cond <= if_id_register.ir( 12 downto 10 );
       -- decodes: OPCODE_XXX
     else
       id_ex_register_next.cond <= if_id_register.ir( 10 downto 8 );
     end if;
   end process;
   
-  pc: process( if_id_register )
+  pc: process( reset, if_id_register )
   begin
     if reset = '0' then
       id_ex_register_next.pc <= RESET_PC_VALUE;
@@ -138,21 +140,21 @@ begin  -- id_stage_rtl
     end if;
   end process;
   
-  rx_decode_and_fetch: process (reset, if_id_register, id_ex_register_next)
+  rx_decode_and_fetch: process ( reset, if_id_register, id_ex_register_next, rx)
   begin
     -- make sure we don't synthesize a latch for rx_addr
-    rx_addr <= ( others => '0' );
+    rx_addr_int <= ( others => '0' );
     
     if reset = '0' then
       id_ex_register_next.rX <= ( others => '0' );
       id_ex_register_next.rX_addr <= ( others => '0' );
     elsif id_ex_register_next.opcode = OPCODE_LD_IMM or 
       id_ex_register_next.opcode = OPCODE_LD_IMM_HB then
-      rx_addr <= if_id_register.ir( 11 downto 8 );
+      rx_addr_int <= if_id_register.ir( 11 downto 8 );
       id_ex_register_next.rX <= rx;
       id_ex_register_next.rX_addr <= if_id_register.ir( 11 downto 8 );
     else
-      rx_addr <= if_id_register.ir( 7 downto 4 );
+      rx_addr_int <= if_id_register.ir( 7 downto 4 );
       id_ex_register_next.rX <= rx;
       id_ex_register_next.rX_addr <= if_id_register.ir( 7 downto 4 );
     end if;
@@ -166,29 +168,29 @@ begin  -- id_stage_rtl
     end if;
   end process;
   
-  ry_decode_and_fetch: process (reset, if_id_register, id_ex_register_next)
+  ry_decode_and_fetch: process ( reset, if_id_register, id_ex_register_next, ry )
   begin
-    -- make sure we don't synthesize a latch for ry_addr
-    ry_addr <= ( others => '0' );
+    -- make sure we don't synthesize a latch for ry_addr_int
+    ry_addr_int <= ( others => '0' );
     
     if reset = '0' then
       id_ex_register_next.rY <= ( others => '0' );
     else
-      ry_addr <= if_id_register.ir( 3 downto 0 );
-      id_ex_register_next.rZ <= rz;
+      ry_addr_int <= if_id_register.ir( 3 downto 0 );
+      id_ex_register_next.rY <= ry;
     end if;
   end process;
   
-  rz_decode_and_fetch: process (reset, if_id_register, id_ex_register_next)
+  rz_decode_and_fetch: process ( reset, if_id_register, id_ex_register_next, rz )
   begin
-    -- make sure we don't synthesize a latch for rz_addr
-    rz_addr <= ( others => '0' );
+    -- make sure we don't synthesize a latch for rz_addr_int
+    rz_addr_int <= ( others => '0' );
     
     if reset = '0' then
       id_ex_register_next.rZ <= ( others => '0' );
     else
       -- only the lower 2-bits of rz are encoded in the instruction
-      rz_addr <= "00" & if_id_register.ir( 9 downto 8 );
+      rz_addr_int <= "00" & if_id_register.ir( 9 downto 8 );
       id_ex_register_next.rZ <= rz;
     end if;
   end process;
@@ -210,6 +212,61 @@ begin  -- id_stage_rtl
       when others =>
         id_ex_register_next.immediate <= x"000" & if_id_register.ir( 3 downto 0 );
     end case;
+  end process;
+  
+  -- Check if all registers are available. If not stall the pipeline.
+  lock: process( reset, id_ex_register_next, rx_addr_int, ry_addr_int, rz_addr_int, lock_register )
+    variable required: LOCK_REGISTER_T;
+  begin
+    required := ( others => '0' );
+    if id_ex_register_next.cond /= COND_UNCONDITIONAL then
+      required( TO_INTEGER( UNSIGNED( SR_REGISTER_ADDR ) ) ) := '1';
+    end if;
+    case id_ex_register_next.opcode is
+      when OPCODE_LD_DISP => 
+        required( TO_INTEGER( UNSIGNED( rz_addr_int ) ) ) := '1'; 
+        required( TO_INTEGER( UNSIGNED( ry_addr_int ) ) ) := '1';
+      when OPCODE_LD_DISP_MS =>
+        required( TO_INTEGER( UNSIGNED( rz_addr_int ) ) ) := '1'; 
+        required( TO_INTEGER( UNSIGNED( ry_addr_int ) ) ) := '1';         
+      when OPCODE_LD_REG =>
+        required( TO_INTEGER( UNSIGNED( ry_addr_int ) ) ) := '1';
+      when OPCODE_ST_DISP =>
+        required( TO_INTEGER( UNSIGNED( rx_addr_int ) ) ) := '1'; 
+        required( TO_INTEGER( UNSIGNED( rz_addr_int ) ) ) := '1'; 
+        required( TO_INTEGER( UNSIGNED( ry_addr_int ) ) ) := '1';
+      when OPCODE_ADD =>
+        required( TO_INTEGER( UNSIGNED( ry_addr_int ) ) ) := '1';
+      when OPCODE_SUB =>
+        required( TO_INTEGER( UNSIGNED( ry_addr_int ) ) ) := '1';
+      when OPCODE_NEG =>
+        required( TO_INTEGER( UNSIGNED( ry_addr_int ) ) ) := '1';
+      when OPCODE_ARS =>
+        required( TO_INTEGER( UNSIGNED( ry_addr_int ) ) ) := '1';        
+      when OPCODE_ALS =>
+        required( TO_INTEGER( UNSIGNED( ry_addr_int ) ) ) := '1';
+      when OPCODE_AND =>
+        required( TO_INTEGER( UNSIGNED( ry_addr_int ) ) ) := '1';        
+      when OPCODE_NOT =>
+        required( TO_INTEGER( UNSIGNED( ry_addr_int ) ) ) := '1';                
+      when OPCODE_EOR =>
+        required( TO_INTEGER( UNSIGNED( ry_addr_int ) ) ) := '1';                
+      when OPCODE_LS =>
+        required( TO_INTEGER( UNSIGNED( ry_addr_int ) ) ) := '1';                
+      when OPCODE_RS =>
+        required( TO_INTEGER( UNSIGNED( ry_addr_int ) ) ) := '1';                
+      when OPCODE_JMP =>
+        required( TO_INTEGER( UNSIGNED( rx_addr_int ) ) ) := '1';                
+      when OPCODE_TST =>
+        required( TO_INTEGER( UNSIGNED( rx_addr_int ) ) ) := '1';                
+      when others => null;
+    end case;
+    
+    -- no checks if all registers are not locked.
+    stall_out <= '0';
+    if ( required & lock_register ) /= x"0000" then
+      stall_out <= '1';
+    end if;
   end process;
   
 end id_stage_rtl;
