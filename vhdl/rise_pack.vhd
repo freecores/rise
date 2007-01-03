@@ -52,6 +52,10 @@ package RISE_PACK is
   subtype ALUOP2_T is std_logic_vector(ALUOP2_WIDTH-1 downto 0);
 
   --
+  constant SR_REGISTER_ADDR : REGISTER_ADDR_T := "1111";
+  constant PC_REGISTER_ADDR : REGISTER_ADDR_T := "1110";
+  constant LR_REGISTER_ADDR : REGISTER_ADDR_T := "1101";
+  
   constant SR_REGISTER_DI : INTEGER := 15;
   constant SR_REGISTER_IP_MASK : INTEGER := 12;
   constant SR_REGISTER_OVERFLOW : INTEGER := 3;
