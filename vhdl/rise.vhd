@@ -48,8 +48,10 @@ architecture rise_rtl of rise is
   signal rz_sig                    : REGISTER_T; 
   signal sr_id_sig                 : SR_REGISTER_T;
   signal lock_register_sig         : LOCK_REGISTER_T;
-  signal set_reg_lock_sig          : std_logic;
-  signal lock_reg_addr_sig         : REGISTER_ADDR_T;
+  signal set_reg_lock0_sig         : std_logic;
+  signal lock_reg_addr0_sig        : REGISTER_ADDR_T;
+  signal set_reg_lock1_sig         : std_logic;
+  signal lock_reg_addr1_sig        : REGISTER_ADDR_T;
   signal stall_in_id_sig           : std_logic;
   signal stall_out_id_sig          : std_logic;
   signal clear_in_id_sig           : std_logic;
@@ -72,7 +74,8 @@ architecture rise_rtl of rise is
   signal lr_sig                    : PC_REGISTER_T; 
   signal sr_wb_sig                 : SR_REGISTER_T;
   signal clear_out_wb_sig          : std_logic;
-  signal clear_reg_lock_sig        : std_logic;
+  signal clear_reg_lock0_sig       : std_logic;
+  signal clear_reg_lock1_sig       : std_logic;
   -- imem signals
   signal data_in_imem_sig          : MEM_DATA_T;  -- unused at the moment
   
@@ -106,16 +109,18 @@ architecture rise_rtl of rise is
       rx_addr        : out REGISTER_ADDR_T;
       ry_addr        : out REGISTER_ADDR_T;
       rz_addr        : out REGISTER_ADDR_T;
-    
+      
       rx             : in REGISTER_T;
       ry             : in REGISTER_T;
       rz             : in REGISTER_T; 
       sr             : in SR_REGISTER_T;
 
       lock_register  : in LOCK_REGISTER_T;
-      set_reg_lock   : out std_logic;
-      lock_reg_addr  : out REGISTER_ADDR_T;
-    
+      set_reg_lock0  : out std_logic;
+      lock_reg_addr0 : out REGISTER_ADDR_T;
+      set_reg_lock1  : out std_logic;
+      lock_reg_addr1 : out REGISTER_ADDR_T;
+      
       stall_in       : in std_logic;
       stall_out      : out std_logic;
       clear_in       : in std_logic);
@@ -151,22 +156,22 @@ architecture rise_rtl of rise is
       clear_in            : in std_logic;
       clear_out           : out std_logic);
   end component;
-    
+  
   component wb_stage
     port (
       clk                 : in std_logic;
       reset               : in std_logic;
 
       mem_wb_register     : in MEM_WB_REGISTER_T;
-    
+      
       dreg_addr           : out REGISTER_ADDR_T;
       dreg                : out REGISTER_T;
-        
+      
       lr                  : out PC_REGISTER_T; 
       sr                  : out SR_REGISTER_T;
-    
+      
       clear_out           : out std_logic;
-    
+      
       clear_reg_lock      : out std_logic);
   end component;
 
@@ -211,7 +216,7 @@ architecture rise_rtl of rise is
       data_in        : in MEM_DATA_T;
       data_out       : out MEM_DATA_T);
   end component;
-    
+  
   component rlu  
     port (
       clk                 : in std_logic;
@@ -219,9 +224,13 @@ architecture rise_rtl of rise is
 
       lock_register       : out LOCK_REGISTER_T;
 
-      clear_reg_lock      : in std_logic;
-      set_reg_lock        : in std_logic;
-      reg_addr            : in REGISTER_ADDR_T);
+      clear_reg_lock0     : in std_logic;
+      set_reg_lock0       : in std_logic;
+      reg_addr0           : in REGISTER_ADDR_T;
+      
+      clear_reg_lock1     : in std_logic;
+      set_reg_lock1       : in std_logic;
+      reg_addr1           : in REGISTER_ADDR_T );
   end component;
   
 begin  -- rise_rtl
@@ -255,16 +264,18 @@ begin  -- rise_rtl
       rx_addr        => rx_addr_sig,
       ry_addr        => ry_addr_sig,
       rz_addr        => rz_addr_sig,
-    
+      
       rx             => rx_sig,
       ry             => ry_sig,
       rz             => rz_sig,
       sr             => sr_id_sig,
 
       lock_register  => lock_register_sig,
-      set_reg_lock   => set_reg_lock_sig,
-      lock_reg_addr  => lock_reg_addr_sig,
-    
+      set_reg_lock0  => set_reg_lock0_sig,
+      lock_reg_addr0 => lock_reg_addr0_sig,
+      set_reg_lock1  => set_reg_lock1_sig,
+      lock_reg_addr1 => lock_reg_addr1_sig,
+      
       stall_in       => stall_in_id_sig,
       stall_out      => stall_out_id_sig,
       clear_in       => clear_in_id_sig);
@@ -297,23 +308,23 @@ begin  -- rise_rtl
       stall_out           => stall_out_mem_sig,
       clear_in            => clear_in_mem_sig,
       clear_out           => clear_out_mem_sig);
-    
+  
   wb_stage_unit : wb_stage
     port map (
       clk                 => clk,
       reset               => reset,
 
       mem_wb_register     => mem_wb_register_sig,
-    
+      
       dreg_addr           => dreg_addr_sig,
       dreg                => dreg_sig,
-        
+      
       lr                  => lr_sig,
       sr                  => sr_wb_sig,
-    
+      
       clear_out           => clear_out_wb_sig,
-    
-      clear_reg_lock      => clear_reg_lock_sig);
+      
+      clear_reg_lock      => clear_reg_lock0_sig);
 
   register_file_unit : register_file
     port map (
@@ -344,7 +355,7 @@ begin  -- rise_rtl
       addr           => imem_addr_sig,
       data_in        => data_in_imem_sig,
       data_out       => imem_data_sig);
-    
+  
   dmem_unit : dmem
     port map (
       clk            => clk,
@@ -353,7 +364,7 @@ begin  -- rise_rtl
       addr           => dmem_addr_sig,
       data_in        => dmem_data_out_sig,
       data_out       => dmem_data_in_sig);
-    
+  
   rlu_unit : rlu  
     port map (
       clk                 => clk,
@@ -361,9 +372,14 @@ begin  -- rise_rtl
 
       lock_register       => lock_register_sig,
 
-      clear_reg_lock      => clear_reg_lock_sig,
-      set_reg_lock        => set_reg_lock_sig,
-      reg_addr            => lock_reg_addr_sig);
+      clear_reg_lock0     => clear_reg_lock0_sig,
+      set_reg_lock0       => set_reg_lock0_sig,
+      reg_addr0           => lock_reg_addr0_sig,
+      
+      clear_reg_lock1     => clear_reg_lock1_sig,
+      set_reg_lock1       => set_reg_lock1_sig,
+      reg_addr1           => lock_reg_addr1_sig      
+      );
 
   clear_in_if_sig       <= clear_out_ex_sig or clear_out_mem_sig or clear_out_wb_sig;
   clear_in_id_sig       <= clear_in_if_sig;
