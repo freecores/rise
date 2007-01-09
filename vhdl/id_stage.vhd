@@ -166,7 +166,7 @@ begin  -- id_stage_rtl
     end if;
 
     if opcode_modifies_sr(id_ex_register_next.opcode) = '1' then
-      lock_reg_addr1 <= id_ex_register_next.rX_addr;
+      lock_reg_addr1 <= SR_REGISTER_ADDR;
       set_reg_lock1  <= '1';
     else
       lock_reg_addr1 <= (others => '-');
