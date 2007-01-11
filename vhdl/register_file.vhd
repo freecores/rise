@@ -26,20 +26,20 @@ entity register_file is
     ry_addr        : in REGISTER_ADDR_T;
     rz_addr        : in REGISTER_ADDR_T;
 	 
-	 rx_read        : out REGISTER_T;
+    rx_read        : out REGISTER_T;
     ry_read        : out REGISTER_T;
     rz_read        : out REGISTER_T;
 	 
     dreg_addr      : in REGISTER_ADDR_T; 
     dreg_write     : in REGISTER_T;
-    dreg_enable	 : in std_logic;	
+    dreg_enable	   : in std_logic;	
 	 
-	 sr_read        : out SR_REGISTER_T;
+    sr_read        : out SR_REGISTER_T;
     sr_write       : in SR_REGISTER_T;
-    sr_enable		 : in std_logic;
+    sr_enable	   : in std_logic;
 	 
-	 lr_write       : in PC_REGISTER_T;
-	 lr_enable		 : in std_logic;
+    lr_write       : in PC_REGISTER_T;
+    lr_enable	   : in std_logic;
 	 
     pc_write       : in PC_REGISTER_T;
     pc_read        : out PC_REGISTER_T);
