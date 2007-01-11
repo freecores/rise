@@ -71,8 +71,11 @@ architecture rise_rtl of rise is
   -- wb_stage signals
   signal dreg_addr_sig             : REGISTER_ADDR_T;
   signal dreg_sig                  : REGISTER_T;
-  signal lr_sig                    : PC_REGISTER_T; 
+  signal dreg_enable_sig           : std_logic;
+  signal lr_sig                    : PC_REGISTER_T;
+  signal lr_enable_sig             : std_logic;
   signal sr_wb_sig                 : SR_REGISTER_T;
+  signal sr_enable_sig             : std_logic;
   signal clear_out_wb_sig          : std_logic;
   signal clear_reg_lock0_sig       : std_logic;
   signal clear_reg_lock1_sig       : std_logic;
@@ -166,9 +169,13 @@ architecture rise_rtl of rise is
       
       dreg_addr           : out REGISTER_ADDR_T;
       dreg                : out REGISTER_T;
+      dreg_enable         : out std_logic;
       
-      lr                  : out PC_REGISTER_T; 
+      lr                  : out PC_REGISTER_T;
+      lr_enable           : in std_logic;
+      
       sr                  : out SR_REGISTER_T;
+      sr_enable           : out std_logic;
       
       clear_out           : out std_logic;
       
@@ -183,17 +190,23 @@ architecture rise_rtl of rise is
       rx_addr        : in REGISTER_ADDR_T;
       ry_addr        : in REGISTER_ADDR_T;
       rz_addr        : in REGISTER_ADDR_T;
-      dreg_addr      : in REGISTER_ADDR_T;
       
-      dreg_write     : in REGISTER_T;
       rx_read        : out REGISTER_T;
       ry_read        : out REGISTER_T;
       rz_read        : out REGISTER_T;
-
-      sr_write       : in SR_REGISTER_T;
-      lr_write       : in PC_REGISTER_T;
-      pc_write       : in PC_REGISTER_T;
+      
+      dreg_addr      : in REGISTER_ADDR_T; 
+      dreg_write     : in REGISTER_T;
+      dreg_enable    : in std_logic;	
+      
       sr_read        : out SR_REGISTER_T;
+      sr_write       : in SR_REGISTER_T;
+      sr_enable      : in std_logic;
+      
+      lr_write       : in PC_REGISTER_T;
+      lr_enable	     : in std_logic;
+      
+      pc_write       : in PC_REGISTER_T;
       pc_read        : out PC_REGISTER_T);
   end component;
 
@@ -318,9 +331,13 @@ begin  -- rise_rtl
       
       dreg_addr           => dreg_addr_sig,
       dreg                => dreg_sig,
+      dreg_enable         => dreg_enable_sig,
       
       lr                  => lr_sig,
+      lr_enable           => lr_enable_sig,
+      
       sr                  => sr_wb_sig,
+      sr_enable           => sr_enable_sig,
       
       clear_out           => clear_out_wb_sig,
       
@@ -334,17 +351,23 @@ begin  -- rise_rtl
       rx_addr        => rx_addr_sig,
       ry_addr        => ry_addr_sig,
       rz_addr        => rz_addr_sig,
-      dreg_addr      => dreg_addr_sig,
-      
-      dreg_write     => dreg_sig,
+
       rx_read        => rx_sig,
       ry_read        => ry_sig,
       rz_read        => rz_sig,
-
-      sr_write       => sr_wb_sig,
-      lr_write       => lr_sig,
-      pc_write       => pc_next_if_sig,
+      
+      dreg_addr      => dreg_addr_sig,
+      dreg_write     => dreg_sig,
+      dreg_enable    => dreg_enable_sig,
+      
       sr_read        => sr_id_sig,
+      sr_write       => sr_wb_sig,
+      sr_enable      => sr_enable_sig,
+      
+      lr_write       => lr_sig,
+      lr_enable      => lr_enable_sig,
+      
+      pc_write       => pc_next_if_sig,
       pc_read        => pc_if_sig);
 
   imem_unit : imem
