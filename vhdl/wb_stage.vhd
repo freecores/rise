@@ -24,9 +24,13 @@ entity wb_stage is
     
     dreg_addr           : out REGISTER_ADDR_T;
     dreg                : out REGISTER_T;
-        
-    lr                  : out PC_REGISTER_T; 
+    dreg_enable         : out std_logic;
+    
+    lr                  : out PC_REGISTER_T;
+    lr_enable           : in std_logic;
+    
     sr                  : out SR_REGISTER_T;
+    sr_enable           : out std_logic;
     
     clear_out           : out std_logic;
     
