@@ -67,7 +67,7 @@ package RISE_PACK is
   
   constant COND_NONE : COND_T := "000";
   constant PC_ADDR : REGISTER_ADDR_T := CONV_STD_LOGIC_VECTOR(14, REGISTER_ADDR_WIDTH);
-
+  constant PC_RESET_VECTOR : MEM_ADDR_T := ( others => '0' );
   -- RISE OPCODES --
   -- load opcodes
   constant OPCODE_LD_IMM        : OPCODE_T := "10000";
