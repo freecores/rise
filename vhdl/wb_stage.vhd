@@ -34,7 +34,10 @@ entity wb_stage is
     
     clear_out           : out std_logic;
     
-    clear_reg_lock      : out std_logic);
+    clear_reg_lock0     : out std_logic;
+    lock_reg_addr0      : out REGISTER_ADDR_T;
+    clear_reg_lock1     : out std_logic;
+    lock_reg_addr1      : out REGISTER_ADDR_T);
 
 
 end wb_stage;
@@ -43,6 +46,6 @@ architecture wb_stage_rtl of wb_stage is
 
 begin  -- wb_stage_rtl
 
-  
+  clear_out <= '-';                     -- clear_out output is unused at the moment.
 
 end wb_stage_rtl;
