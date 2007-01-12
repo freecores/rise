@@ -19,15 +19,19 @@ entity rlu is
     clk   : in std_logic;
     reset : in std_logic;
 
-    lock_register : out LOCK_REGISTER_T;
+    lock_register       : out LOCK_REGISTER_T;
 
-    clear_reg_lock0 : in std_logic;
-    set_reg_lock0   : in std_logic;
-    reg_addr0       : in REGISTER_ADDR_T;
+    set_lock0           : in std_logic;
+    set_lock_addr0      : in REGISTER_ADDR_T;
 
-    clear_reg_lock1 : in std_logic;
-    set_reg_lock1   : in std_logic;
-    reg_addr1       : in REGISTER_ADDR_T);
+    set_lock1           : in std_logic;
+    set_lock_addr1      : in REGISTER_ADDR_T;
+    
+    clear_lock0         : in std_logic;
+    clear_lock_addr0    : in REGISTER_ADDR_T;
+    
+    clear_lock1         : in std_logic;
+    clear_lock_addr1    : in REGISTER_ADDR_T);
 
 end rlu;
 
@@ -51,8 +55,10 @@ begin  -- rlu_rtl
   end process;
 
   async : process (lock_register_int,
-                   clear_reg_lock0, set_reg_lock0, reg_addr0,
-                   clear_reg_lock1, set_reg_lock1, reg_addr1)
+                   clear_lock0, set_lock0,
+                   clear_lock1, set_lock1, 
+                   clear_lock_addr0, set_lock_addr0,
+                   clear_lock_addr1, set_lock_addr1)
   begin  -- process async
     lock_register_next <= lock_register_int;
 
@@ -60,17 +66,22 @@ begin  -- rlu_rtl
     -- the last assignment counts this also works correct if reg_addr0
     -- and reg_addr1 are the same and one unlocks and one locks the
     -- register (correct behaviour is that the register is locked).
-    if clear_reg_lock0 = '1' and set_reg_lock0 = '0' then
-      lock_register_next(to_integer(unsigned(reg_addr0))) <= '0';
+
+    -- clear register0 lock
+    if clear_lock0 = '1' then
+      lock_register_next(to_integer(unsigned(clear_lock_addr0))) <= '0';
     end if;
-    if clear_reg_lock1 = '1' and set_reg_lock1 = '0' then
-      lock_register_next(to_integer(unsigned(reg_addr1))) <= '0';
+    -- clear register1 lock
+    if clear_lock1 = '1' then
+      lock_register_next(to_integer(unsigned(clear_lock_addr1))) <= '0';
     end if;
-    if set_reg_lock0 = '1' and clear_reg_lock0 = '0' then
-      lock_register_next(to_integer(unsigned(reg_addr0))) <= '1';
+    -- set register0 lock
+    if set_lock0 = '1' then
+      lock_register_next(to_integer(unsigned(set_lock_addr0))) <= '1';
     end if;
-    if set_reg_lock1 = '1' and clear_reg_lock1 = '0' then
-      lock_register_next(to_integer(unsigned(reg_addr1))) <= '1';
+    -- set register1 lock
+    if set_lock1 = '1' then
+      lock_register_next(to_integer(unsigned(set_lock_addr1))) <= '1';
     end if;
     
   end process async;
