@@ -43,7 +43,7 @@ package RISE_PACK is
   subtype MEM_ADDR_T is std_logic_vector(MEM_ADDR_WIDTH-1 downto 0);
 
   subtype LOCK_REGISTER_T is std_logic_vector(LOCK_WIDTH-1 downto 0);
-    
+  
   subtype IMMEDIATE_T is std_logic_vector(IMMEDIATE_WIDTH-1 downto 0);
   subtype OPCODE_T is std_logic_vector(OPCODE_WIDTH-1 downto 0);
   subtype COND_T is std_logic_vector(COND_WIDTH-1 downto 0);
@@ -152,13 +152,15 @@ package RISE_PACK is
                               lr            : PC_REGISTER_T;
                               sr            : SR_REGISTER_T;
                             end record;
-    
+  
   type MEM_WB_REGISTER_T is record
                               aluop1        : ALUOP1_T;
                               aluop2        : ALUOP2_T;
                               reg           : REGISTER_T;
+                              mem_reg       : REGISTER_T;
                               dreg_addr     : REGISTER_ADDR_T;                           
                               lr            : PC_REGISTER_T;
+                              sr            : SR_REGISTER_T;
                             end record;
   
 end RISE_PACK;
