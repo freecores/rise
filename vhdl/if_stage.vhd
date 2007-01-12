@@ -63,7 +63,7 @@ architecture if_state_behavioral of if_stage is
 begin
   if_id_register <= if_id_register_int;
 
-  process (clk, reset)
+  process (clk, reset, clear_in)
   begin
     if reset = '0' or clear_in = '1' then
       if_id_register_int.pc <= PC_RESET_VECTOR;
@@ -75,7 +75,7 @@ begin
     end if;
   end process;
 
-  process (branch, branch_target, pc)
+  process (reset, branch, branch_target, pc, clear_in)
   begin
     if reset = '0' or clear_in = '1' then
       if_id_register_next.pc <= PC_RESET_VECTOR;
