@@ -57,8 +57,8 @@ end if_stage;
 -- This is a simple hardcoded IF unit for the  RISE processor. It does not
 -- use the memory and contains a hardcoded programm.
 architecture if_state_behavioral of if_stage is
-  signal if_id_register_int  : IF_ID_REGISTER_T;
-  signal if_id_register_next : IF_ID_REGISTER_T;
+  signal if_id_register_int  : IF_ID_REGISTER_T := ( others => ( others => '0' ) );
+  signal if_id_register_next : IF_ID_REGISTER_T := ( others => ( others => '0' ) );
   
 begin
   if_id_register <= if_id_register_int;
@@ -79,6 +79,7 @@ begin
   begin
     if reset = '0' or clear_in = '1' then
       if_id_register_next.pc <= PC_RESET_VECTOR;
+      pc_next <= PC_RESET_VECTOR;
     else
       if_id_register_next.pc <= pc;
       if branch = '1' then
