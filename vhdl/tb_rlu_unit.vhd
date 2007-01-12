@@ -22,45 +22,70 @@ architecture behavior of tb_rlu_unit_vhd is
 
   -- component Declaration for the Unit Under Test (UUT)
   component rlu is
-  
-  port (
-    clk                 : in std_logic;
-    reset               : in std_logic;
 
-    lock_register       : out LOCK_REGISTER_T;
+                  port (
+                    clk   : in std_logic;
+                    reset : in std_logic;
 
-    clear_reg_lock      : in std_logic;
-    set_reg_lock        : in std_logic;
-    reg_addr            : in REGISTER_ADDR_T);
+                    lock_register : out LOCK_REGISTER_T;
+
+                    set_lock0      : in std_logic;
+                    set_lock_addr0 : in REGISTER_ADDR_T;
+
+                    set_lock1      : in std_logic;
+                    set_lock_addr1 : in REGISTER_ADDR_T;
+
+                    clear_lock0      : in std_logic;
+                    clear_lock_addr0 : in REGISTER_ADDR_T;
+
+                    clear_lock1      : in std_logic;
+                    clear_lock_addr1 : in REGISTER_ADDR_T);
 
   end component;
-    
+
   constant clk_period : time := 10 ns;
 
   --inputs
-  signal clk            : std_logic := '0';
-  signal reset          : std_logic := '0';
-  signal clear_reg_lock : std_logic := '0';
-  signal set_reg_lock   : std_logic := '0';
-  signal reg_addr       : REGISTER_ADDR_T;
-  
+  signal clk   : std_logic := '0';
+  signal reset : std_logic := '0';
+
+  signal clear_lock0_sig      : std_logic := '0';
+  signal clear_lock_addr0_sig : REGISTER_ADDR_T;
+
+  signal clear_lock1_sig      : std_logic := '0';
+  signal clear_lock_addr1_sig : REGISTER_ADDR_T;
+
+  signal set_lock0_sig      : std_logic := '0';
+  signal set_lock_addr0_sig : REGISTER_ADDR_T;
+
+  signal set_lock1_sig      : std_logic := '0';
+  signal set_lock_addr1_sig : REGISTER_ADDR_T;
+
   --Outputs
   signal lock_register : LOCK_REGISTER_T;
-  
+
 begin
 
   -- instantiate the Unit Under Test (UUT)
   uut : rlu port map(
-    clk             => clk,
-    reset           => reset,
-    lock_register   => lock_register, 
+    clk                 => clk,
+    reset               => reset,
 
-    clear_reg_lock  => clear_reg_lock,
-    set_reg_lock    => set_reg_lock,
-    reg_addr        => reg_addr);
+    lock_register       => lock_register,
+
+    set_lock0           => set_lock0_sig,
+    set_lock_addr0      => set_lock_addr0_sig,
+
+    set_lock1           => set_lock1_sig,
+    set_lock_addr1      => set_lock_addr1_sig,
+
+    clear_lock0         => clear_lock0_sig,
+    clear_lock_addr0    => clear_lock_addr0_sig,
+
+    clear_lock1         => clear_lock1_sig,
+    clear_lock_addr1    => clear_lock_addr1_sig);
 
 
-  
   cg : process
   begin
     clk <= '1';
@@ -76,17 +101,15 @@ begin
     reset <= '1';
 
 
-    reg_addr <= CONV_STD_LOGIC_VECTOR(8, REGISTER_ADDR_WIDTH);
-    set_reg_lock <= '1';
+    set_lock_addr0_sig     <= CONV_STD_LOGIC_VECTOR(8, REGISTER_ADDR_WIDTH);
+    set_lock0_sig <= '1';
     wait for clk_period;
-    reg_addr <= CONV_STD_LOGIC_VECTOR(5, REGISTER_ADDR_WIDTH);
-    set_reg_lock <= '1';
-    wait for clk_period;
-    set_reg_lock <= '0';
-    reg_addr <= CONV_STD_LOGIC_VECTOR(8, REGISTER_ADDR_WIDTH);
-    clear_reg_lock <= '1';
-    wait for clk_period;
-    clear_reg_lock <= '0';
+    set_lock_addr0_sig     <= CONV_STD_LOGIC_VECTOR(9, REGISTER_ADDR_WIDTH);
+    set_lock0_sig <= '1';
+    set_lock_addr1_sig     <= SR_REGISTER_ADDR;
+    set_lock1_sig <= '1';
+    clear_lock_addr0_sig   <= CONV_STD_LOGIC_VECTOR(8, REGISTER_ADDR_WIDTH);
+    clear_lock0_sig <= '1';
     
     wait;                               -- will wait forever
   end process;
