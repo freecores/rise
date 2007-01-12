@@ -51,6 +51,7 @@ architecture id_stage_rtl of id_stage is
   signal rz_addr_int         : REGISTER_ADDR_T;
   signal id_ex_register_int  : ID_EX_REGISTER_T;
   signal id_ex_register_next : ID_EX_REGISTER_T;
+  signal stall_out_int       : std_logic;
 
   function opcode_modifies_sr(opcode : in OPCODE_T) return std_logic is
     variable modifies : std_logic;
@@ -83,7 +84,7 @@ begin  -- id_stage_rtl
   ry_addr        <= ry_addr_int;
   rz_addr        <= rz_addr_int;
   id_ex_register <= id_ex_register_int;
-
+  stall_out      <= stall_out_int;
 --  process (clk, reset)
 --  begin  -- process
 --    if reset = '0' then                 -- asynchronous reset (active low)
@@ -106,16 +107,18 @@ begin  -- id_stage_rtl
       id_ex_register_int.rY        <= (others => '0');
       id_ex_register_int.rZ        <= (others => '0');
       id_ex_register_int.immediate <= (others => '0');
-    elsif clk'event and clk = '1' and stall_in = '0' then
-      id_ex_register_int <= id_ex_register_next;
+    elsif clk'event and clk = '1' then
+      if stall_in = '0' then
+        id_ex_register_int <= id_ex_register_next;
+      end if;
     end if;
   end process;
 
   -- The opc_extender decodes the two different formats used for the opcodes
   -- in the instruction set into a single 5-bit opcode format.
-  opc_extender : process (clk, reset, if_id_register)
+  opc_extender : process (clk, reset, if_id_register, stall_out_int)
   begin
-    if reset = '0' then
+    if reset = '0' or stall_out_int = '1' then
       id_ex_register_next.opcode <= OPCODE_NOP;
       -- decodes: OPCODE_LD_IMM, OPCODE_LD_IMM_HB
     elsif if_id_register.ir(15 downto 13) = "100" then
@@ -129,9 +132,9 @@ begin  -- id_stage_rtl
     end if;
   end process;
 
-  cond_decode : process (clk, reset, if_id_register)
+  cond_decode : process (clk, reset, if_id_register, stall_out_int)
   begin
-    if reset = '0' then
+    if reset = '0' or stall_out_int = '1' then
       id_ex_register_next.cond <= COND_NONE;
       -- decodes: OPCODE_LD_IMM, OPCODE_LD_IMM_HB
     elsif if_id_register.ir(15 downto 13) = "100" then
@@ -145,9 +148,9 @@ begin  -- id_stage_rtl
     end if;
   end process;
 
-  pc : process(reset, if_id_register)
+  pc : process(reset, if_id_register, stall_out_int)
   begin
-    if reset = '0' then
+    if reset = '0' or stall_out_int = '1' then
       id_ex_register_next.pc <= RESET_PC_VALUE;
     else
       id_ex_register_next.pc <= if_id_register.pc;
@@ -157,9 +160,9 @@ begin  -- id_stage_rtl
   -- The SR fetch process read the value of the SR registers and passes it to
   -- the execute pipeline. In addition it checks if the opcode modifies the
   -- SR register and if yes locks the register.
-  sr_fetch : process (reset, sr)
+  sr_fetch : process (reset, sr, stall_out_int, id_ex_register_next)
   begin
-    if reset = '0' then
+    if reset = '0' or stall_out_int = '1' then
       id_ex_register_next.sr <= RESET_SR_VALUE;
     else
       id_ex_register_next.sr <= sr;
@@ -174,12 +177,12 @@ begin  -- id_stage_rtl
     end if;
   end process;
 
-  rx_decode_and_fetch : process (reset, if_id_register, id_ex_register_next, rx)
+  rx_decode_and_fetch : process (reset, if_id_register, id_ex_register_next, rx, stall_out_int)
   begin
     -- make sure we don't synthesize a latch for rx_addr
     rx_addr_int <= (others => '0');
 
-    if reset = '0' then
+    if reset = '0' or stall_out_int = '1' then
       id_ex_register_next.rX      <= (others => '0');
       id_ex_register_next.rX_addr <= (others => '0');
     elsif id_ex_register_next.opcode = OPCODE_LD_IMM or
@@ -203,12 +206,12 @@ begin  -- id_stage_rtl
   end process;
 
 
-  ry_decode_and_fetch : process (reset, if_id_register, id_ex_register_next, ry)
+  ry_decode_and_fetch : process (reset, if_id_register, id_ex_register_next, ry, stall_out_int)
   begin
     -- make sure we don't synthesize a latch for ry_addr_int
     ry_addr_int <= (others => '0');
 
-    if reset = '0' then
+    if reset = '0' or stall_out_int = '1' then
       id_ex_register_next.rY <= (others => '0');
     else
       ry_addr_int            <= if_id_register.ir(3 downto 0);
@@ -216,12 +219,12 @@ begin  -- id_stage_rtl
     end if;
   end process;
 
-  rz_decode_and_fetch : process (reset, if_id_register, id_ex_register_next, rz)
+  rz_decode_and_fetch : process (reset, if_id_register, id_ex_register_next, rz, stall_out_int)
   begin
     -- make sure we don't synthesize a latch for rz_addr_int
     rz_addr_int <= (others => '0');
 
-    if reset = '0' then
+    if reset = '0' or stall_out_int = '1' then
       id_ex_register_next.rZ <= (others => '0');
     else
       -- only the lower 2-bits of rz are encoded in the instruction
@@ -250,7 +253,7 @@ begin  -- id_stage_rtl
   end process;
 
   -- Check if all registers are available. If not stall the pipeline.
-  lock : process(reset, id_ex_register_next, rx_addr_int, ry_addr_int, rz_addr_int, lock_register)
+  lock : process(reset, id_ex_register_next, rx_addr_int, ry_addr_int, rz_addr_int, lock_register, stall_out_int)
     variable required : LOCK_REGISTER_T;
   begin
     required := (others => '0');
@@ -298,9 +301,9 @@ begin  -- id_stage_rtl
     end case;
 
     -- no checks if all registers are not locked.
-    stall_out <= '0';
+    stall_out_int <= '0';
     if (required and lock_register) /= x"0000" then
-      stall_out <= '1';
+      stall_out_int <= '1';
     end if;
   end process;
   
