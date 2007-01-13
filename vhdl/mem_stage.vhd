@@ -50,8 +50,8 @@ begin  -- mem_stage_rtl
   mem_wb_register.lr            <= mem_wb_register_int.lr;
   mem_wb_register.sr            <= mem_wb_register_int.sr;
 
-  clear_out                     <= '-';  -- clear_out output is unused at the moment.
-  
+  clear_out                     <= '0';  -- clear_out output is unused at the moment.
+  stall_out                     <= '0';  -- development (temporarily)
   process (clk, reset)
   begin  -- process
     if reset = '0' then                 -- asynchronous reset (active low)
