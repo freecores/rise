@@ -56,8 +56,7 @@ begin
   tb : process
   begin
 
-    -- Wait 100 ns for global reset to finish
-    wait for 95 ns;
+    wait for 5 ns;
 
     -- Place stimulus here
     reset <= '1';
