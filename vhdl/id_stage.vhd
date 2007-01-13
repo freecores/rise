@@ -180,7 +180,7 @@ begin  -- id_stage_rtl
       id_ex_register_next.sr <= sr;
     end if;
 
-    if opcode_modifies_sr(id_ex_register_next.opcode) = '1' then
+    if opcode_modifies_sr(id_ex_register_next.opcode) = '1' and stall_out_int = '0' then
       lock_reg_addr1 <= SR_REGISTER_ADDR;
       set_reg_lock1  <= '1';
     else
@@ -208,7 +208,7 @@ begin  -- id_stage_rtl
       id_ex_register_next.rX_addr <= if_id_register.ir(7 downto 4);
     end if;
 
-    if opcode_modifies_rx(id_ex_register_next.opcode) = '1' then
+    if opcode_modifies_rx(id_ex_register_next.opcode) = '1' and stall_out_int = '0' then
       lock_reg_addr0 <= id_ex_register_next.rX_addr;
       set_reg_lock0  <= '1';
     else
@@ -273,6 +273,13 @@ begin  -- id_stage_rtl
       required(TO_INTEGER(unsigned(SR_REGISTER_ADDR))) := '1';
     end if;
     case id_ex_register_next.opcode is
+      -- looks strange but ld rX, #0xAA also needs the register because we
+      -- can only load the high or low byte and the other one must be
+      -- preserved.
+      when OPCODE_LD_IMM =>
+        required(TO_INTEGER(unsigned(rx_addr_int))) := '1';
+      when OPCODE_LD_IMM_HB =>
+        required(TO_INTEGER(unsigned(rx_addr_int))) := '1';
       when OPCODE_LD_DISP =>
         required(TO_INTEGER(unsigned(rz_addr_int))) := '1';
         required(TO_INTEGER(unsigned(ry_addr_int))) := '1';
