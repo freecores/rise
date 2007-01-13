@@ -182,7 +182,7 @@ architecture rise_rtl of rise is
       dreg_enable         : out std_logic;
       
       lr                  : out PC_REGISTER_T;
-      lr_enable           : in std_logic;
+      lr_enable           : out std_logic;
       
       sr                  : out SR_REGISTER_T;
       sr_enable           : out std_logic;
