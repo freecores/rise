@@ -82,20 +82,40 @@ begin
       pc_next <= PC_RESET_VECTOR;
     else
       if_id_register_next.pc <= pc;
-      if branch = '1' then
-        pc_next <= branch_target;
+      
+      if stall_in = '0' then
+        if branch = '1' then
+          pc_next <= branch_target;
+        else
+          pc_next <= std_logic_vector(unsigned(pc) + 2);
+        end if;
       else
-        pc_next <= std_logic_vector(unsigned(pc) + 2);
+        pc_next <= pc;
       end if;
     end if;
   end process;
 
+  -- 00000000 <reset>:
+  -- 0:   81 03           ld R1,#0x3
+  -- 2:   91 01           ldhb R1,#0x1
+  -- 4:   82 30           ld R2,#0x30
+  -- 6:   82 33           ld R2,#0x33
+  -- 8:   10 12           add R1,R2
+  -- a:   88 00           ld R8,#0x0
+  -- c:   98 00           ldhb R8,#0x0
+  -- e:   70 08           jmp R8
   process (pc)
   begin
     case pc is
-      when x"0000" => if_id_register_next.ir <= x"8012";  -- ld r0, #0x12
-      when x"0002" => if_id_register_next.ir <= x"8d01";  -- ld r5, #0x01
-      when others  => if_id_register_next.ir <= x"0000";
+      when x"0000" => if_id_register_next.ir <= x"8103";  -- ld R1,#0x3
+      when x"0002" => if_id_register_next.ir <= x"9101";  -- ldhb R1,#0x1
+      when x"0004" => if_id_register_next.ir <= x"8230";  -- ld R2,#0x30
+      when x"0006" => if_id_register_next.ir <= x"8233";  -- ld R2,#0x33
+      when x"0008" => if_id_register_next.ir <= x"1012";  -- add R1,R2
+      when x"000A" => if_id_register_next.ir <= x"8800";  -- ld R8,#0x0
+      when x"000C" => if_id_register_next.ir <= x"9800";  -- ldhb R8,#0x0
+      when x"7008" => if_id_register_next.ir <= x"7008";  -- jmp R8
+      when others => if_id_register_next.ir <= x"0000"; -- nop
     end case;
   end process;
   
