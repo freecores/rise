@@ -56,7 +56,7 @@ architecture register_file_rtl of register_file is
 
 begin  -- register_file_rtl
 
-	SYNC: process(clk, reset, dreg_enable)
+	SYNC: process(clk, reset, dreg_enable, sr_enable, lr_enable)
 	begin
 		
 		if reset = '0' then
