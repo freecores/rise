@@ -27,7 +27,6 @@ entity imem is
 end imem;
 
 architecture imem_rtl of imem is
-
   component idmem
     port (
       addr: IN std_logic_VECTOR(11 downto 0);
@@ -38,9 +37,7 @@ architecture imem_rtl of imem is
       we: IN std_logic);
   end component;
 
-
 begin  -- imem_rtl
-
   INSTRUCTION_MEM : idmem
     port map (
       addr => addr(11 downto 0),
@@ -49,5 +46,4 @@ begin  -- imem_rtl
       dout => data_out,
       sinit => reset,
       we => wr_enable);
-
 end imem_rtl;
