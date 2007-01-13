@@ -46,6 +46,6 @@ architecture wb_stage_rtl of wb_stage is
 
 begin  -- wb_stage_rtl
 
-  clear_out <= '-';                     -- clear_out output is unused at the moment.
+  clear_out <= '0';                     -- clear_out output is unused at the moment.
 
 end wb_stage_rtl;
