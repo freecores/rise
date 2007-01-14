@@ -12,6 +12,7 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.numeric_std.all;
 use work.rise_pack.all;
+use work.RISE_PACK_SPECIFIC.all;
 
 entity tb_id_stage_unit_vhd is
 end tb_id_stage_unit_vhd;
@@ -71,7 +72,7 @@ architecture behavior of tb_id_stage_unit_vhd is
   signal lock_reg_addr1 : REGISTER_ADDR_T;
   signal stall_out      : std_logic;
 
-  constant TB_COND_TEST_VALUE : COND_T := COND_NONE;
+  constant TB_COND_TEST_VALUE : COND_T := COND_UNCONDITIONAL;
 
   constant TB_R1_TEST_VALUE : REGISTER_T := x"0001";
   constant TB_R2_TEST_VALUE : REGISTER_T := x"0002";

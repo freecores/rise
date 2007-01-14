@@ -11,6 +11,8 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.numeric_std.all;
+use work.RISE_PACK.all;
+use work.RISE_PACK_SPECIFIC.all;
 
 entity tb_register_file_vhd is
 end tb_register_file_vhd;

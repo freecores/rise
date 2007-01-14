@@ -14,6 +14,7 @@ use ieee.std_logic_signed.all;
 use ieee.numeric_std.all;
 use IEEE.STD_LOGIC_ARITH.all;
 use work.rise_pack.all;
+use work.RISE_PACK_SPECIFIC.all;
 
 entity tb_ex_stage_unit_vhd is
 end tb_ex_stage_unit_vhd;

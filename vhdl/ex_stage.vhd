@@ -14,6 +14,7 @@ use IEEE.std_logic_signed.all;
 use IEEE.STD_LOGIC_ARITH.all;
 
 use WORK.RISE_PACK.all;
+use work.RISE_PACK_SPECIFIC.all;
 
 entity ex_stage is
   

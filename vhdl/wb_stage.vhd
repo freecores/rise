@@ -12,7 +12,7 @@ use IEEE.STD_LOGIC_1164.all;
 use IEEE.STD_LOGIC_ARITH.all;
 
 use WORK.RISE_PACK.all;
-
+use work.RISE_PACK_SPECIFIC.all;
 
 entity wb_stage is
   
