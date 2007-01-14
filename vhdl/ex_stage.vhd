@@ -207,7 +207,7 @@ begin  -- ex_stage_rtl
     ex_mem_register_next.dreg_addr <= id_ex_register.rX_addr;
     ex_mem_register_next.reg <= (others => '0');
     ex_mem_register_next.lr <= (others => '0');
-        
+
     aluop1_int(ALUOP1_LD_MEM_BIT) <= '0';
     aluop1_int(ALUOP1_ST_MEM_BIT) <= '0';
     aluop1_int(ALUOP1_WB_REG_BIT) <= '1';
@@ -216,7 +216,8 @@ begin  -- ex_stage_rtl
     
     isLoadOp <= '0';
     isJmpOp <= '0';
-  
+    bs_left <= '0';
+    bs_arithmetic <= '0';
     case id_ex_register.opcode is
       -- load opcodes
       when OPCODE_LD_IMM =>
