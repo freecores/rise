@@ -1,5 +1,5 @@
 (edif test (edifVersion 2 0 0) (edifLevel 0) (keywordMap (keywordLevel 0))
-(status (written (timeStamp 2007 1 10 0 54 20)
+(status (written (timeStamp 2007 1 14 14 42 55)
    (author "Xilinx, Inc.")
    (program "Xilinx CORE Generator" (version "Xilinx CORE Generator 8.1.03i"))))
    (comment "                                                                                
@@ -41,7 +41,7 @@
        (comment "c_yprimitive_type = 8kx2 ")
        (comment "c_ytop_addr = 1024 ")
        (comment "c_yhierarchy = hierarchy1 ")
-       (comment "c_has_limit_data_pitch = 0 ")
+       (comment "c_has_limit_data_pitch = 1 ")
        (comment "c_has_rdy = 0 ")
        (comment "c_write_mode = 0 ")
        (comment "c_width = 16 ")
