@@ -257,7 +257,7 @@ begin  -- id_stage_rtl
     case id_ex_register_next.opcode is
       -- The immediate values holds the upper 8 bits of a 16 bit value.
       when OPCODE_LD_IMM_HB =>
-        id_ex_register_next.immediate <= if_id_register.ir(7 downto 0) & x"00";
+        id_ex_register_next.immediate <= x"00" & if_id_register.ir(7 downto 0);
         -- The immediate values holds the lower 8 bits of a 16 bit value. 
       when OPCODE_LD_IMM =>
         id_ex_register_next.immediate <= x"00" & if_id_register.ir(7 downto 0);
