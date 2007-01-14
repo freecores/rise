@@ -92,15 +92,20 @@ begin  -- wb_stage_rtl
         lr_enable       <= '1';
         clear_reg_lock1 <= '1';
         lock_reg_addr1  <= LR_REGISTER_ADDR;
+      else
+        lr              <= ( others => 'X' );
+        lr_enable       <= '0';
       end if;
       -- write back of SR --
       if mem_wb_register.aluop2(ALUOP2_SR_BIT) = '1' then
-        lr              <= mem_wb_register.lr;
-        lr_enable       <= '1';
+        sr              <= mem_wb_register.sr;
+        sr_enable       <= '1';
         clear_reg_lock1 <= '1';
         lock_reg_addr1  <= SR_REGISTER_ADDR;
+      else
+        sr              <= ( others => 'X' );
+        sr_enable       <= '0';
       end if;
-      
     end if;
   end process;
 end wb_stage_rtl;
