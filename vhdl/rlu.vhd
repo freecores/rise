@@ -18,7 +18,8 @@ entity rlu is
   port (
     clk   : in std_logic;
     reset : in std_logic;
-
+    clear_locks : in std_logic;
+    
     lock_register       : out LOCK_REGISTER_T;
 
     set_lock0           : in std_logic;
@@ -50,7 +51,11 @@ begin  -- rlu_rtl
     if reset = '0' then                 -- asynchronous reset (active low)
       lock_register_int <= (others => '0');
     elsif clk'event and clk = '1' then  -- rising clock edge
-      lock_register_int <= lock_register_next;
+      if clear_locks = '1' then
+        lock_register_int <= (others => '0');
+      else
+        lock_register_int <= lock_register_next;
+      end if;
     end if;
   end process;
 
