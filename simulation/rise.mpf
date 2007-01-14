@@ -94,7 +94,7 @@ VHDL93 = 1
 [vsim]
 ; Simulator resolution
 ; Set to fs, ps, ns, us, ms, or sec with optional prefix of 1, 10, or 100.
-resolution = 1ps
+resolution = 1ns
 
 ; User time unit for run commands
 ; Set to default, fs, ps, ns, us, ms, or sec. The default is to use the
@@ -103,7 +103,7 @@ resolution = 1ps
 UserTimeUnit = default
 
 ; Default run length
-RunLength = 300 ns
+RunLength = 0 ns
 
 ; Maximum iterations that can be run without advancing simulation time
 IterationLimit = 1000
@@ -119,7 +119,7 @@ IterationLimit = 1000
 
 ; Stop the simulator after an assertion message
 ; 0 = Note  1 = Warning  2 = Error  3 = Failure  4 = Fatal
-BreakOnAssertion = 3
+BreakOnAssertion = 4
 
 ; Assertion Message Format
 ; %S - Severity Level 
@@ -203,36 +203,41 @@ ConcurrentFileLimit = 40
 ; List of dynamically loaded objects for Verilog PLI applications
 ; Veriuser = veriuser.sl
 
+DelayFileOpen = 1
 [lmc]
 [Project]
 Project_Version = 6
 Project_DefaultLib = work
 Project_SortMethod = unused
-Project_Files_Count = 12
+Project_Files_Count = 14
 Project_File_0 = C:/Projects/RISE/vhdl/tb_rise.vhd
-Project_File_P_0 = vhdl_novitalcheck 0 file_type vhdl group_id 0 vhdl_nodebug 0 vhdl_1164 1 vhdl_noload 0 vhdl_synth 0 vhdl_enable0In 0 folder {Top Level} last_compile 1168690684 vhdl_disableopt 0 vhdl_vital 0 vhdl_vopt 0 vhdl_warn1 1 vhdl_explicit 1 vhdl_warn2 1 vhdl_showsource 0 vhdl_warn3 1 vhdl_0InOptions {} vhdl_warn4 1 vhdl_options {} vhdl_warn5 1 ood 0 compile_to work compile_order 11 cover_nosub 0 dont_compile 0 vhdl_use93 93
-Project_File_1 = C:/Projects/RISE/vhdl/rlu.vhd
-Project_File_P_1 = vhdl_novitalcheck 0 file_type vhdl group_id 0 vhdl_nodebug 0 vhdl_1164 1 vhdl_noload 0 vhdl_synth 0 vhdl_enable0In 0 folder {Top Level} last_compile 1168713555 vhdl_disableopt 0 vhdl_vital 0 vhdl_vopt 0 vhdl_warn1 1 vhdl_explicit 1 vhdl_warn2 1 vhdl_showsource 0 vhdl_warn3 1 vhdl_0InOptions {} vhdl_warn4 1 vhdl_options {} vhdl_warn5 1 ood 0 compile_to work compile_order 10 cover_nosub 0 dont_compile 0 vhdl_use93 93
-Project_File_2 = C:/Projects/RISE/vhdl/wb_stage.vhd
-Project_File_P_2 = vhdl_novitalcheck 0 file_type vhdl group_id 0 vhdl_nodebug 0 vhdl_1164 1 vhdl_noload 0 vhdl_synth 0 vhdl_enable0In 0 folder {Top Level} last_compile 1168718089 vhdl_disableopt 0 vhdl_vital 0 vhdl_vopt 0 vhdl_warn1 1 vhdl_explicit 1 vhdl_warn2 1 vhdl_showsource 0 vhdl_warn3 1 vhdl_0InOptions {} vhdl_warn4 1 vhdl_options {} vhdl_warn5 1 ood 0 compile_to work compile_order 0 cover_nosub 0 dont_compile 0 vhdl_use93 93
-Project_File_3 = C:/Projects/RISE/vhdl/register_file.vhd
-Project_File_P_3 = vhdl_novitalcheck 0 file_type vhdl group_id 0 vhdl_nodebug 0 vhdl_1164 1 vhdl_noload 0 vhdl_synth 0 vhdl_enable0In 0 folder {Top Level} last_compile 1168713590 vhdl_disableopt 0 vhdl_vital 0 vhdl_vopt 0 vhdl_warn1 1 vhdl_explicit 1 vhdl_warn2 1 vhdl_showsource 0 vhdl_warn3 1 vhdl_0InOptions {} vhdl_warn4 1 vhdl_options {} vhdl_warn5 1 ood 0 compile_to work compile_order 7 cover_nosub 0 dont_compile 0 vhdl_use93 93
-Project_File_4 = C:/Projects/RISE/vhdl/ex_stage.vhd
-Project_File_P_4 = vhdl_novitalcheck 0 file_type vhdl group_id 0 vhdl_nodebug 0 vhdl_1164 1 vhdl_noload 0 vhdl_synth 0 vhdl_enable0In 0 folder {Top Level} last_compile 1168623903 vhdl_disableopt 0 vhdl_vital 0 vhdl_vopt 0 vhdl_warn1 1 vhdl_explicit 1 vhdl_warn2 1 vhdl_showsource 0 vhdl_warn3 1 vhdl_0InOptions {} vhdl_warn4 1 vhdl_options {} vhdl_warn5 1 ood 0 compile_to work compile_order 2 cover_nosub 0 dont_compile 0 vhdl_use93 93
-Project_File_5 = C:/Projects/RISE/vhdl/id_stage.vhd
-Project_File_P_5 = vhdl_novitalcheck 0 file_type vhdl group_id 0 vhdl_nodebug 0 vhdl_1164 1 vhdl_noload 0 vhdl_synth 0 vhdl_enable0In 0 folder {Top Level} last_compile 1168719151 vhdl_disableopt 0 vhdl_vital 0 vhdl_vopt 0 vhdl_warn1 1 vhdl_explicit 1 vhdl_warn2 1 vhdl_showsource 0 vhdl_warn3 1 vhdl_0InOptions {} vhdl_warn4 1 vhdl_options {} vhdl_warn5 1 ood 0 compile_to work compile_order 3 cover_nosub 0 dont_compile 0 vhdl_use93 93
-Project_File_6 = C:/Projects/RISE/vhdl/imem.vhd
-Project_File_P_6 = vhdl_novitalcheck 0 file_type vhdl group_id 0 vhdl_nodebug 0 vhdl_1164 1 vhdl_noload 0 vhdl_synth 0 vhdl_enable0In 0 folder {Top Level} last_compile 1168717186 vhdl_disableopt 0 vhdl_vital 0 vhdl_warn1 1 vhdl_vopt 0 vhdl_showsource 0 vhdl_warn2 1 vhdl_explicit 1 vhdl_0InOptions {} vhdl_warn3 1 vhdl_options {} vhdl_warn4 1 ood 0 vhdl_warn5 1 compile_to work compile_order 5 dont_compile 0 cover_nosub 0 vhdl_use93 93
-Project_File_7 = C:/Projects/RISE/vhdl/rise_pack.vhd
-Project_File_P_7 = vhdl_novitalcheck 0 file_type vhdl group_id 0 vhdl_nodebug 0 vhdl_1164 1 vhdl_noload 0 vhdl_synth 0 vhdl_enable0In 0 folder {Top Level} last_compile 1168717710 vhdl_disableopt 0 vhdl_vital 0 vhdl_warn1 1 vhdl_vopt 0 vhdl_showsource 0 vhdl_warn2 1 vhdl_explicit 1 vhdl_0InOptions {} vhdl_warn3 1 vhdl_options {} vhdl_warn4 1 ood 0 vhdl_warn5 1 compile_to work compile_order 9 dont_compile 0 cover_nosub 0 vhdl_use93 93
-Project_File_8 = C:/Projects/RISE/vhdl/if_stage.vhd
-Project_File_P_8 = vhdl_novitalcheck 0 file_type vhdl group_id 0 vhdl_nodebug 0 vhdl_1164 1 vhdl_noload 0 vhdl_synth 0 vhdl_enable0In 0 folder {Top Level} last_compile 1168713555 vhdl_disableopt 0 vhdl_vital 0 vhdl_vopt 0 vhdl_warn1 1 vhdl_explicit 1 vhdl_warn2 1 vhdl_showsource 0 vhdl_warn3 1 vhdl_0InOptions {} vhdl_warn4 1 vhdl_options {} vhdl_warn5 1 ood 0 compile_to work compile_order 4 cover_nosub 0 dont_compile 0 vhdl_use93 93
-Project_File_9 = C:/Projects/RISE/vhdl/mem_stage.vhd
-Project_File_P_9 = vhdl_novitalcheck 0 file_type vhdl group_id 0 vhdl_nodebug 0 vhdl_1164 1 vhdl_noload 0 vhdl_synth 0 vhdl_enable0In 0 folder {Top Level} last_compile 1168718015 vhdl_disableopt 0 vhdl_vital 0 vhdl_warn1 1 vhdl_vopt 0 vhdl_showsource 0 vhdl_warn2 1 vhdl_explicit 1 vhdl_0InOptions {} vhdl_warn3 1 vhdl_options {} vhdl_warn4 1 ood 0 vhdl_warn5 1 compile_to work compile_order 6 dont_compile 0 cover_nosub 0 vhdl_use93 93
-Project_File_10 = C:/Projects/RISE/vhdl/dmem.vhd
-Project_File_P_10 = vhdl_novitalcheck 0 file_type vhdl group_id 0 vhdl_nodebug 0 vhdl_1164 1 vhdl_noload 0 vhdl_synth 0 vhdl_enable0In 0 folder {Top Level} last_compile 1168717137 vhdl_disableopt 0 vhdl_vital 0 vhdl_warn1 1 vhdl_vopt 0 vhdl_showsource 0 vhdl_warn2 1 vhdl_explicit 1 vhdl_0InOptions {} vhdl_warn3 1 vhdl_options {} vhdl_warn4 1 ood 0 vhdl_warn5 1 compile_to work compile_order 1 dont_compile 0 cover_nosub 0 vhdl_use93 93
-Project_File_11 = C:/Projects/RISE/vhdl/rise.vhd
-Project_File_P_11 = vhdl_novitalcheck 0 file_type vhdl group_id 0 vhdl_nodebug 0 vhdl_1164 1 vhdl_noload 0 vhdl_synth 0 vhdl_enable0In 0 folder {Top Level} last_compile 1168715321 vhdl_disableopt 0 vhdl_vital 0 vhdl_warn1 1 vhdl_vopt 0 vhdl_showsource 0 vhdl_warn2 1 vhdl_explicit 1 vhdl_0InOptions {} vhdl_warn3 1 vhdl_options {} vhdl_warn4 1 ood 0 vhdl_warn5 1 compile_to work compile_order 8 dont_compile 0 cover_nosub 0 vhdl_use93 93
+Project_File_P_0 = vhdl_novitalcheck 0 file_type vhdl group_id 0 vhdl_nodebug 0 vhdl_1164 1 vhdl_noload 0 vhdl_synth 0 vhdl_enable0In 0 folder {Top Level} last_compile 1168729943 vhdl_disableopt 0 vhdl_vital 0 vhdl_vopt 0 vhdl_warn1 1 vhdl_explicit 1 vhdl_warn2 1 vhdl_showsource 0 vhdl_warn3 1 vhdl_0InOptions {} vhdl_warn4 1 vhdl_options {} vhdl_warn5 1 ood 0 compile_to work compile_order 11 cover_nosub 0 dont_compile 0 vhdl_use93 93
+Project_File_1 = C:/Projects/rise/vhdl/rise_pack_sim.vhd
+Project_File_P_1 = vhdl_novitalcheck 0 file_type vhdl group_id 0 vhdl_nodebug 0 vhdl_1164 1 vhdl_noload 0 vhdl_synth 0 vhdl_enable0In 0 folder {Top Level} last_compile 1168730963 vhdl_disableopt 0 vhdl_vital 0 vhdl_vopt 0 vhdl_warn1 1 vhdl_explicit 1 vhdl_warn2 1 vhdl_showsource 0 vhdl_warn3 1 vhdl_0InOptions {} vhdl_warn4 1 vhdl_options {} vhdl_warn5 1 ood 0 compile_to work compile_order 13 cover_nosub 0 dont_compile 0 vhdl_use93 93
+Project_File_2 = C:/Projects/RISE/vhdl/rlu.vhd
+Project_File_P_2 = vhdl_novitalcheck 0 file_type vhdl group_id 0 vhdl_nodebug 0 vhdl_1164 1 vhdl_noload 0 vhdl_synth 0 vhdl_enable0In 0 folder {Top Level} last_compile 1168729864 vhdl_disableopt 0 vhdl_vital 0 vhdl_warn1 1 vhdl_vopt 0 vhdl_showsource 0 vhdl_warn2 1 vhdl_explicit 1 vhdl_0InOptions {} vhdl_warn3 1 vhdl_options {} vhdl_warn4 1 ood 0 vhdl_warn5 1 compile_to work compile_order 10 dont_compile 0 cover_nosub 0 vhdl_use93 93
+Project_File_3 = C:/Projects/RISE/vhdl/wb_stage.vhd
+Project_File_P_3 = vhdl_novitalcheck 0 file_type vhdl group_id 0 vhdl_nodebug 0 vhdl_1164 1 vhdl_noload 0 vhdl_synth 0 vhdl_enable0In 0 folder {Top Level} last_compile 1168729965 vhdl_disableopt 0 vhdl_vital 0 vhdl_warn1 1 vhdl_vopt 0 vhdl_showsource 0 vhdl_warn2 1 vhdl_explicit 1 vhdl_0InOptions {} vhdl_warn3 1 vhdl_options {} vhdl_warn4 1 ood 0 vhdl_warn5 1 compile_to work compile_order 0 dont_compile 0 cover_nosub 0 vhdl_use93 93
+Project_File_4 = C:/Projects/RISE/vhdl/register_file.vhd
+Project_File_P_4 = vhdl_novitalcheck 0 file_type vhdl group_id 0 vhdl_nodebug 0 vhdl_1164 1 vhdl_noload 0 vhdl_synth 0 vhdl_enable0In 0 folder {Top Level} last_compile 1168729833 vhdl_disableopt 0 vhdl_vital 0 vhdl_vopt 0 vhdl_warn1 1 vhdl_explicit 1 vhdl_warn2 1 vhdl_showsource 0 vhdl_warn3 1 vhdl_0InOptions {} vhdl_warn4 1 vhdl_options {} vhdl_warn5 1 ood 0 compile_to work compile_order 7 cover_nosub 0 dont_compile 0 vhdl_use93 93
+Project_File_5 = C:/Projects/rise/vhdl/rise_const_pack.vhd
+Project_File_P_5 = vhdl_novitalcheck 0 file_type vhdl group_id 0 vhdl_nodebug 0 vhdl_1164 1 vhdl_noload 0 vhdl_synth 0 vhdl_enable0In 0 folder {Top Level} last_compile 1168730920 vhdl_disableopt 0 vhdl_vital 0 vhdl_warn1 1 vhdl_vopt 0 vhdl_showsource 0 vhdl_warn2 1 vhdl_explicit 1 vhdl_0InOptions {} vhdl_warn3 1 vhdl_options {} vhdl_warn4 1 ood 0 vhdl_warn5 1 compile_to work compile_order 12 dont_compile 0 cover_nosub 0 vhdl_use93 93
+Project_File_6 = C:/Projects/RISE/vhdl/ex_stage.vhd
+Project_File_P_6 = vhdl_novitalcheck 0 file_type vhdl group_id 0 vhdl_nodebug 0 vhdl_1164 1 vhdl_noload 0 vhdl_synth 0 vhdl_enable0In 0 folder {Top Level} last_compile 1168729787 vhdl_disableopt 0 vhdl_vital 0 vhdl_warn1 1 vhdl_vopt 0 vhdl_showsource 0 vhdl_warn2 1 vhdl_explicit 1 vhdl_0InOptions {} vhdl_warn3 1 vhdl_options {} vhdl_warn4 1 ood 0 vhdl_warn5 1 compile_to work compile_order 2 dont_compile 0 cover_nosub 0 vhdl_use93 93
+Project_File_7 = C:/Projects/RISE/vhdl/id_stage.vhd
+Project_File_P_7 = vhdl_novitalcheck 0 file_type vhdl group_id 0 vhdl_nodebug 0 vhdl_1164 1 vhdl_noload 0 vhdl_synth 0 vhdl_enable0In 0 folder {Top Level} last_compile 1168730732 vhdl_disableopt 0 vhdl_vital 0 vhdl_vopt 0 vhdl_warn1 1 vhdl_explicit 1 vhdl_warn2 1 vhdl_showsource 0 vhdl_warn3 1 vhdl_0InOptions {} vhdl_warn4 1 vhdl_options {} vhdl_warn5 1 ood 0 compile_to work compile_order 3 cover_nosub 0 dont_compile 0 vhdl_use93 93
+Project_File_8 = C:/Projects/RISE/vhdl/imem.vhd
+Project_File_P_8 = vhdl_novitalcheck 0 file_type vhdl group_id 0 vhdl_nodebug 0 vhdl_1164 1 vhdl_noload 0 vhdl_synth 0 vhdl_enable0In 0 folder {Top Level} last_compile 1168729816 vhdl_disableopt 0 vhdl_vital 0 vhdl_vopt 0 vhdl_warn1 1 vhdl_explicit 1 vhdl_warn2 1 vhdl_showsource 0 vhdl_warn3 1 vhdl_0InOptions {} vhdl_warn4 1 vhdl_options {} vhdl_warn5 1 ood 0 compile_to work compile_order 5 cover_nosub 0 dont_compile 0 vhdl_use93 93
+Project_File_9 = C:/Projects/RISE/vhdl/rise_pack.vhd
+Project_File_P_9 = vhdl_novitalcheck 0 file_type vhdl group_id 0 vhdl_nodebug 0 vhdl_1164 1 vhdl_noload 0 vhdl_synth 0 vhdl_enable0In 0 folder {Top Level} last_compile 1168730169 vhdl_disableopt 0 vhdl_vital 0 vhdl_warn1 1 vhdl_vopt 0 vhdl_showsource 0 vhdl_warn2 1 vhdl_explicit 1 vhdl_0InOptions {} vhdl_warn3 1 vhdl_options {} vhdl_warn4 1 ood 0 vhdl_warn5 1 compile_to work compile_order 9 dont_compile 0 cover_nosub 0 vhdl_use93 93
+Project_File_10 = C:/Projects/RISE/vhdl/if_stage.vhd
+Project_File_P_10 = vhdl_novitalcheck 0 file_type vhdl group_id 0 vhdl_nodebug 0 vhdl_1164 1 vhdl_noload 0 vhdl_synth 0 vhdl_enable0In 0 folder {Top Level} last_compile 1168729807 vhdl_disableopt 0 vhdl_vital 0 vhdl_vopt 0 vhdl_warn1 1 vhdl_explicit 1 vhdl_warn2 1 vhdl_showsource 0 vhdl_warn3 1 vhdl_0InOptions {} vhdl_warn4 1 vhdl_options {} vhdl_warn5 1 ood 0 compile_to work compile_order 4 cover_nosub 0 dont_compile 0 vhdl_use93 93
+Project_File_11 = C:/Projects/RISE/vhdl/mem_stage.vhd
+Project_File_P_11 = vhdl_novitalcheck 0 file_type vhdl group_id 0 vhdl_nodebug 0 vhdl_1164 1 vhdl_noload 0 vhdl_synth 0 vhdl_enable0In 0 folder {Top Level} last_compile 1168729825 vhdl_disableopt 0 vhdl_vital 0 vhdl_vopt 0 vhdl_warn1 1 vhdl_explicit 1 vhdl_warn2 1 vhdl_showsource 0 vhdl_warn3 1 vhdl_0InOptions {} vhdl_warn4 1 vhdl_options {} vhdl_warn5 1 ood 0 compile_to work compile_order 6 cover_nosub 0 dont_compile 0 vhdl_use93 93
+Project_File_12 = C:/Projects/RISE/vhdl/dmem.vhd
+Project_File_P_12 = vhdl_novitalcheck 0 file_type vhdl group_id 0 vhdl_nodebug 0 vhdl_1164 1 vhdl_noload 0 vhdl_synth 0 vhdl_enable0In 0 folder {Top Level} last_compile 1168729774 vhdl_disableopt 0 vhdl_vital 0 vhdl_vopt 0 vhdl_warn1 1 vhdl_explicit 1 vhdl_warn2 1 vhdl_showsource 0 vhdl_warn3 1 vhdl_0InOptions {} vhdl_warn4 1 vhdl_options {} vhdl_warn5 1 ood 0 compile_to work compile_order 1 cover_nosub 0 dont_compile 0 vhdl_use93 93
+Project_File_13 = C:/Projects/RISE/vhdl/rise.vhd
+Project_File_P_13 = vhdl_novitalcheck 0 file_type vhdl group_id 0 vhdl_nodebug 0 vhdl_1164 1 vhdl_noload 0 vhdl_synth 0 vhdl_enable0In 0 folder {Top Level} last_compile 1168729842 vhdl_disableopt 0 vhdl_vital 0 vhdl_warn1 1 vhdl_vopt 0 vhdl_showsource 0 vhdl_warn2 1 vhdl_explicit 1 vhdl_0InOptions {} vhdl_warn3 1 vhdl_options {} vhdl_warn4 1 ood 0 vhdl_warn5 1 compile_to work compile_order 8 dont_compile 0 cover_nosub 0 vhdl_use93 93
 Project_Sim_Count = 1
 Project_Sim_0 = RISE TB
 Project_Sim_P_0 = Generics {} timing default -std_output {} -nopsl 0 +notimingchecks 0 -L {} selected_du {} -hazards 0 -sdf {} ok 1 folder {Top Level} -0in 0 -nosva 0 -absentisempty 0 +pulse_r {} -multisource_delay {} OtherArgs {} +pulse_e {} -t default -vital2.2b 0 +plusarg {} -sdfnoerror 0 -coverage 0 vopt_env 0 is_vopt_flow 0 -memprof 0 additional_dus work.tb_rise_vhd -nofileshare 0 -noglitch 0 +no_pulse_msg 0 -assertdebug 0 -wlf {} -std_input {} -Lf {} -sdfnowarn 0 -assertfile {} -0in_options {}
@@ -264,6 +269,6 @@ XML_DoubleClick = Edit
 XML_CustomDoubleClick = 
 LOGFILE_DoubleClick = Edit
 LOGFILE_CustomDoubleClick = 
-EditorState = {tabbed horizontal 1} {C:/Projects/RISE/vhdl/mem_stage.vhd 0 0} {C:/Projects/RISE/vhdl/rise.vhd 0 0} {C:/Projects/RISE/vhdl/id_stage.vhd 0 1} {C:/Projects/RISE/vhdl/register_file.vhd 0 0} {C:/Projects/RISE/vhdl/rlu.vhd 0 0} {C:/Projects/RISE/vhdl/dmem.vhd 0 0} {C:/Projects/RISE/vhdl/wb_stage.vhd 0 0} {C:/Projects/RISE/vhdl/ex_stage.vhd 0 0} {C:/Projects/RISE/vhdl/tb_rise.vhd 0 0} {C:/Projects/RISE/vhdl/if_stage.vhd 0 0}
+EditorState = {tabbed horizontal 1} {C:/Projects/rise/vhdl/mem_stage.vhd 0 1} {C:/Projects/rise/vhdl/rise.vhd 0 0} {C:/Projects/rise/vhdl/id_stage.vhd 0 0} {C:/Projects/rise/vhdl/dmem.vhd 0 0} {C:/Projects/rise/vhdl/wb_stage.vhd 0 0} {C:/Projects/rise/vhdl/ex_stage.vhd 0 0} {C:/Projects/rise/vhdl/tb_rise.vhd 0 0} {C:/Projects/rise/vhdl/if_stage.vhd 0 0}
 Project_Major_Version = 6
 Project_Minor_Version = 1
