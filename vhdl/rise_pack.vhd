@@ -12,6 +12,7 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use IEEE.STD_LOGIC_ARITH.all;
+use work.RISE_PACK_SPECIFIC.all;
 
 package RISE_PACK is
 
@@ -21,8 +22,6 @@ package RISE_PACK is
   constant PC_WIDTH : integer := ARCHITECTURE_WIDTH;
   constant IR_WIDTH : integer := ARCHITECTURE_WIDTH;
   constant SR_WIDTH : integer := ARCHITECTURE_WIDTH;
-  constant OPCODE_WIDTH : integer := 5;
-  constant COND_WIDTH : integer := 3;
   constant MEM_DATA_WIDTH : integer := ARCHITECTURE_WIDTH;
   constant MEM_ADDR_WIDTH : integer := ARCHITECTURE_WIDTH;
   
@@ -45,8 +44,6 @@ package RISE_PACK is
   subtype LOCK_REGISTER_T is std_logic_vector(LOCK_WIDTH-1 downto 0);
   
   subtype IMMEDIATE_T is std_logic_vector(IMMEDIATE_WIDTH-1 downto 0);
-  subtype OPCODE_T is std_logic_vector(OPCODE_WIDTH-1 downto 0);
-  subtype COND_T is std_logic_vector(COND_WIDTH-1 downto 0);
 
   subtype ALUOP1_T is std_logic_vector(ALUOP1_WIDTH-1 downto 0);
   subtype ALUOP2_T is std_logic_vector(ALUOP2_WIDTH-1 downto 0);
@@ -69,49 +66,7 @@ package RISE_PACK is
   
   constant PC_RESET_VECTOR : MEM_ADDR_T := x"FFFE";
   
-  -- RISE OPCODES --
-  -- load opcodes
-  constant OPCODE_LD_IMM        : OPCODE_T := "10000";
-  constant OPCODE_LD_IMM_HB     : OPCODE_T := "10010";  
-  constant OPCODE_LD_DISP       : OPCODE_T := "10100";
-  constant OPCODE_LD_DISP_MS    : OPCODE_T := "11000";
-  constant OPCODE_LD_REG        : OPCODE_T := "00001";
-
-  -- store opcodes
-  constant OPCODE_ST_DISP       : OPCODE_T := "11100";
   
-  -- arithmethic opcodes
-  constant OPCODE_ADD           : OPCODE_T := "00010";  
-  constant OPCODE_ADD_IMM       : OPCODE_T := "00011";  
-  constant OPCODE_SUB           : OPCODE_T := "00100";  
-  constant OPCODE_SUB_IMM       : OPCODE_T := "00101";  
-  constant OPCODE_NEG           : OPCODE_T := "00110";  
-  constant OPCODE_ARS           : OPCODE_T := "00111";  
-  constant OPCODE_ALS           : OPCODE_T := "01000";
-
-  -- logical opcodes
-  constant OPCODE_AND : OPCODE_T := "01001";
-  constant OPCODE_NOT : OPCODE_T := "01010";
-  constant OPCODE_EOR : OPCODE_T := "01011";
-  constant OPCODE_LS :  OPCODE_T := "01100";
-  constant OPCODE_RS :  OPCODE_T := "01101";
-  
-  -- program control
-  constant OPCODE_JMP : OPCODE_T := "01110";
-
-  -- other
-  constant OPCODE_TST : OPCODE_T := "01111";
-  constant OPCODE_NOP : OPCODE_T := "00000";
-  
-  -- CONDITION CODES --
-  constant COND_UNCONDITIONAL   : COND_T := "000";
-  constant COND_NOT_ZERO        : COND_T := "001";
-  constant COND_ZERO            : COND_T := "010";
-  constant COND_CARRY           : COND_T := "011";
-  constant COND_NEGATIVE        : COND_T := "100";
-  constant COND_OVERFLOW        : COND_T := "101";
-  constant COND_ZERO_NEGATIVE   : COND_T := "110";
-
   -- STATUS REGISTER BITS --
   constant SR_ZERO_BIT          : integer := 0;
   constant SR_CARRY_BIT         : integer := 1;
