@@ -11,7 +11,7 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 use WORK.RISE_PACK.all;
-
+use work.RISE_PACK_SPECIFIC.all;
 
 entity id_stage is
   
@@ -134,13 +134,13 @@ begin  -- id_stage_rtl
       id_ex_register_next.opcode <= OPCODE_NOP;
       -- decodes: OPCODE_LD_IMM, OPCODE_LD_IMM_HB
     elsif if_id_register.ir(15 downto 13) = "100" then
-      id_ex_register_next.opcode <= if_id_register.ir(15 downto 13) & if_id_register.ir(12) & "0";
+      id_ex_register_next.opcode <= svector2opcode(if_id_register.ir(15 downto 13) & if_id_register.ir(12) & "0");
       -- decodes: OPCODE_LD_DISP, OPCODE_LD_DISP_MS, OPCODE_ST_DISP
     elsif if_id_register.ir(15) = '1' then
-      id_ex_register_next.opcode <= if_id_register.ir(15 downto 13) & "00";
+      id_ex_register_next.opcode <= svector2opcode(if_id_register.ir(15 downto 13) & "00");
       -- decodes: OPCODE_XXX
     else
-      id_ex_register_next.opcode <= if_id_register.ir(15 downto 11);
+      id_ex_register_next.opcode <= svector2opcode(if_id_register.ir(15 downto 11));
     end if;
   end process;
 
@@ -153,10 +153,10 @@ begin  -- id_stage_rtl
       id_ex_register_next.cond <= COND_UNCONDITIONAL;
       -- decodes: OPCODE_LD_DISP, OPCODE_LD_DISP_MS, OPCODE_ST_DISP      
     elsif if_id_register.ir(15) = '1' then
-      id_ex_register_next.cond <= if_id_register.ir(12 downto 10);
+      id_ex_register_next.cond <= svector2cond(if_id_register.ir(12 downto 10));
       -- decodes: OPCODE_XXX
     else
-      id_ex_register_next.cond <= if_id_register.ir(10 downto 8);
+      id_ex_register_next.cond <= svector2cond(if_id_register.ir(10 downto 8));
     end if;
   end process;
 
