@@ -57,6 +57,7 @@ architecture rise_rtl of rise is
   signal stall_in_ex_sig           : std_logic;
   signal clear_in_ex_sig           : std_logic;
   signal clear_out_ex_sig          : std_logic;
+  signal clear_locks_sig           : std_logic;
   -- mem_stage signals
   signal mem_wb_register_sig       : MEM_WB_REGISTER_T;
   signal dmem_addr_sig             : MEM_ADDR_T;
@@ -150,7 +151,8 @@ architecture rise_rtl of rise is
       branch              : out std_logic;
       stall_in            : in std_logic;
       clear_in            : in std_logic;
-      clear_out           : out std_logic);
+      clear_out           : out std_logic;
+      clear_locks         : out std_logic);
   end component;
 
   component mem_stage
@@ -248,7 +250,8 @@ architecture rise_rtl of rise is
     port (
       clk   : in std_logic;
       reset : in std_logic;
-
+      clear_locks : in std_logic;
+    
       lock_register       : out LOCK_REGISTER_T;
 
       set_lock0           : in std_logic;
@@ -324,7 +327,8 @@ begin  -- rise_rtl
       branch              => branch_sig,
       stall_in            => stall_in_ex_sig,
       clear_in            => clear_in_ex_sig,
-      clear_out           => clear_out_ex_sig);
+      clear_out           => clear_out_ex_sig,
+      clear_locks         => clear_locks_sig);
 
   mem_stage_unit : mem_stage
     port map (
@@ -415,7 +419,8 @@ begin  -- rise_rtl
   rlu_unit : rlu port map(
     clk                 => clk,
     reset               => reset,
-
+    clear_locks         => clear_locks_sig,
+    
     lock_register       => lock_register_sig,
 
     set_lock0           => set_lock0_sig,
