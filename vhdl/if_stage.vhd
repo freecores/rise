@@ -10,7 +10,6 @@
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;
---use IEEE.STD_LOGIC_ARITH.all;
 use IEEE.NUMERIC_STD.all;
 use WORK.RISE_PACK.all;
 use work.RISE_PACK_SPECIFIC.all;
@@ -57,17 +56,20 @@ end if_stage;
 --end if_stage_rtl;
 
 -- This is a simple hardcoded IF unit for the  RISE processor. It does not
--- use the memory and contains a hardcoded programm.
+-- use the memory and contains a hardcoded program.
 architecture if_state_behavioral of if_stage is
-  signal if_id_register_int  : IF_ID_REGISTER_T := (others => (others => '0'));
-  signal if_id_register_next : IF_ID_REGISTER_T := (others => (others => '0'));
-  
+
+  signal if_id_register_int  : IF_ID_REGISTER_T := ( others => ( others => '0' ) );
+  signal if_id_register_next : IF_ID_REGISTER_T := ( others => ( others => '0' ) );
+  signal cur_pc : PC_REGISTER_T;
+
 begin
   if_id_register <= if_id_register_int;
+  cur_pc <= pc when branch = '0' else branch_target;
 
   process (clk, reset, clear_in)
   begin
-    if reset = '0' or clear_in = '1' then
+    if reset = '0' then
       if_id_register_int.pc <= PC_RESET_VECTOR;
       if_id_register_int.ir <= (others => '0');
     elsif clk'event and clk = '1' then
@@ -77,22 +79,18 @@ begin
     end if;
   end process;
 
-  process (reset, branch, branch_target, pc, stall_in)
+  process (reset, branch, branch_target, cur_pc, stall_in)
   begin
     if reset = '0' then
       if_id_register_next.pc <= PC_RESET_VECTOR;
       pc_next                <= PC_RESET_VECTOR;
     else
-      if_id_register_next.pc <= pc;
-
+      if_id_register_next.pc <= cur_pc;
+      
       if stall_in = '0' then
-        if branch = '1' then
-          pc_next <= branch_target;
-        else
-          pc_next <= std_logic_vector(unsigned(pc) + 2);
-        end if;
+        pc_next <= std_logic_vector(unsigned(cur_pc) + 2);
       else
-        pc_next <= pc;
+        pc_next <= cur_pc;
       end if;
     end if;
   end process;
@@ -106,22 +104,27 @@ begin
   -- a:   88 00           ld R8,#0x0
   -- c:   98 00           ldhb R8,#0x0
   -- e:   70 08           jmp R8
+  -- 10:  10 12           add R1,R2
+  -- 12:  81 04           ld R1,#0x3
   
---  process (pc)
---  begin
---    case pc is
---      when x"0000" => if_id_register_next.ir <= x"8103";  -- ld R1,#0x3
---      when x"0002" => if_id_register_next.ir <= x"9101";  -- ldhb R1,#0x1
---      when x"0004" => if_id_register_next.ir <= x"8230";  -- ld R2,#0x30
---      when x"0006" => if_id_register_next.ir <= x"8233";  -- ld R2,#0x33
---      when x"0008" => if_id_register_next.ir <= x"1012";  -- add R1,R2
---      when x"000A" => if_id_register_next.ir <= x"8800";  -- ld R8,#0x0
---      when x"000C" => if_id_register_next.ir <= x"9800";  -- ldhb R8,#0x0
---      when x"000E" => if_id_register_next.ir <= x"7008";  -- jmp R8
---      when others => if_id_register_next.ir <= x"0000"; -- nop
---    end case;
---  end process;
---
+--   process (cur_pc)
+--   begin
+--     case cur_pc is
+--       when x"0000" => if_id_register_next.ir <= x"8103";  -- ld R1,#0x3
+--       when x"0002" => if_id_register_next.ir <= x"9101";  -- ldhb R1,#0x1
+--       when x"0004" => if_id_register_next.ir <= x"8230";  -- ld R2,#0x30
+--       when x"0006" => if_id_register_next.ir <= x"8233";  -- ld R2,#0x33
+--       when x"0008" => if_id_register_next.ir <= x"1012";  -- add R1,R2
+--       when x"000A" => if_id_register_next.ir <= x"8800";  -- ld R8,#0x0
+--       when x"000C" => if_id_register_next.ir <= x"9800";  -- ldhb R8,#0x0
+--       when x"000E" => if_id_register_next.ir <= x"7008";  -- jmp R8
+--       when x"0010" => if_id_register_next.ir <= x"1012";  -- add R1,R2
+--       when x"0012" => if_id_register_next.ir <= x"8104";  -- ld R1,#0x3
+--       when others => if_id_register_next.ir <= x"0000"; -- nop
+--     end case;
+--   end process;
+
+  
 --Disassembly of section .text:
 --
 
@@ -145,9 +148,10 @@ begin
   --
   --00000018 <loop_end>:
   --  18:   70 30           jmp R3
-  process (pc)
+  
+  process (cur_pc)
   begin
-    case pc is
+    case cur_pc is
       when x"0000" => if_id_register_next.ir <= x"830c";  -- ld R3,#0xc
       when x"0002" => if_id_register_next.ir <= x"9300";  -- ldhb R3,#0x0
       when x"0004" => if_id_register_next.ir <= x"8410";  -- ld R4,#0x10
