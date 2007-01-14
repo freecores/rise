@@ -186,10 +186,12 @@ begin
     id_ex_register.rY <= CONV_STD_LOGIC_VECTOR(2, REGISTER_WIDTH);
     wait for clk_period;
     id_ex_register.opcode <= OPCODE_LS;
+    id_ex_register.rX <= CONV_STD_LOGIC_VECTOR(3, REGISTER_WIDTH);
     id_ex_register.rY <= CONV_STD_LOGIC_VECTOR(2, REGISTER_WIDTH);
     wait for clk_period;
     id_ex_register.opcode <= OPCODE_RS;
-    id_ex_register.rY <= CONV_STD_LOGIC_VECTOR(4, REGISTER_WIDTH);
+    id_ex_register.rX <= CONV_STD_LOGIC_VECTOR(73, REGISTER_WIDTH);
+    id_ex_register.rY <= CONV_STD_LOGIC_VECTOR(1, REGISTER_WIDTH);
 
     -- other
     wait for clk_period;
