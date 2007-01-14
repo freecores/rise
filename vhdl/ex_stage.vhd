@@ -349,16 +349,18 @@ begin  -- ex_stage_rtl
     ex_mem_register_next.sr <= new_sr;
   end process;
 
-  branch_logic: process (id_ex_register, isLoadOp, isJmpOp)
+  branch_logic: process (id_ex_register, isLoadOp, isJmpOp, execute)
   begin  -- process branch_logic
     branch_int <= '0';
     clear_out_int <= '0';
     clear_locks <= '0';
-    if (id_ex_register.rX_addr = PC_ADDR and isLoadOp = '1') or (isJmpOp = '1') then
-      branch_int <= '1';
-      clear_out_int <= '1';
-      clear_locks <= '1';
-    end if;
+    if execute = '1' then
+      if (id_ex_register.rX_addr = PC_ADDR and isLoadOp = '1') or (isJmpOp = '1') then
+        branch_int <= '1';
+        clear_out_int <= '1';
+        clear_locks <= '1';
+      end if;
+    end if;         
   end process branch_logic;
   
 end ex_stage_rtl;
