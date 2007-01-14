@@ -95,9 +95,9 @@ begin  -- id_stage_rtl
 --    end if;
 --  end process;  
 
-  process (clk, reset, stall_in)
+  process (clk, reset, stall_in, clear_in)
   begin
-    if reset = '0' then
+    if reset = '0' or clear_in = '1' then
       id_ex_register_int.sr        <= RESET_SR_VALUE;
       id_ex_register_int.pc        <= RESET_PC_VALUE;
       id_ex_register_int.opcode    <= OPCODE_NOP;
@@ -172,7 +172,7 @@ begin  -- id_stage_rtl
   -- The SR fetch process read the value of the SR registers and passes it to
   -- the execute pipeline. In addition it checks if the opcode modifies the
   -- SR register and if yes locks the register.
-  sr_fetch : process (reset, sr, id_ex_register_next, stall_out_int )
+  sr_fetch : process (reset, sr, id_ex_register_next, stall_out_int, clear_in )
   begin
     if reset = '0' then
       id_ex_register_next.sr <= RESET_SR_VALUE;
@@ -180,7 +180,7 @@ begin  -- id_stage_rtl
       id_ex_register_next.sr <= sr;
     end if;
 
-    if opcode_modifies_sr(id_ex_register_next.opcode) = '1' and stall_out_int = '0' then
+    if opcode_modifies_sr(id_ex_register_next.opcode) = '1' and stall_out_int = '0' and clear_in = '0' then
       lock_reg_addr1 <= SR_REGISTER_ADDR;
       set_reg_lock1  <= '1';
     else
@@ -189,7 +189,7 @@ begin  -- id_stage_rtl
     end if;
   end process;
 
-  rx_decode_and_fetch : process (reset, if_id_register, id_ex_register_next, rx, stall_out_int )
+  rx_decode_and_fetch : process (reset, if_id_register, id_ex_register_next, rx, stall_out_int, clear_in )
   begin
     -- make sure we don't synthesize a latch for rx_addr
     rx_addr_int <= (others => '0');
@@ -208,7 +208,7 @@ begin  -- id_stage_rtl
       id_ex_register_next.rX_addr <= if_id_register.ir(7 downto 4);
     end if;
 
-    if opcode_modifies_rx(id_ex_register_next.opcode) = '1' and stall_out_int = '0' then
+    if opcode_modifies_rx(id_ex_register_next.opcode) = '1' and stall_out_int = '0' and clear_in = '0' then
       lock_reg_addr0 <= id_ex_register_next.rX_addr;
       set_reg_lock0  <= '1';
     elsif id_ex_register_next.opcode = OPCODE_JMP then
@@ -324,7 +324,7 @@ begin  -- id_stage_rtl
 
     -- no checks if all registers are not locked.
     stall_out_int <= '0';
-    if (required and lock_register) /= x"0000" then
+    if (required and lock_register) /= x"0000" and (clear_in = '0') then
       stall_out_int <= '1';
     end if;
   end process;
