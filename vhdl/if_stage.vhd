@@ -76,7 +76,7 @@ begin
     end if;
   end process;
 
-  process (reset, branch, branch_target, pc, clear_in)
+  process (reset, branch, branch_target, pc, clear_in, stall_in)
   begin
     if reset = '0' or clear_in = '1' then
       if_id_register_next.pc <= PC_RESET_VECTOR;
