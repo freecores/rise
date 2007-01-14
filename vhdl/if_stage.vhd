@@ -1,3 +1,4 @@
+
 -- File: if_stage.vhd
 -- Author: Jakob Lechner, Urban Stadler, Harald Trinkl, Christian Walter
 -- Created: 2006-11-29
@@ -34,7 +35,7 @@ entity if_stage is
     imem_data : in  MEM_DATA_T);
 
 end if_stage;
---
+
 --architecture if_stage_rtl of if_stage is
 --  signal if_id_register_int     : IF_ID_REGISTER_T;
 --  signal if_id_register_next    : IF_ID_REGISTER_T;
@@ -58,8 +59,8 @@ end if_stage;
 -- This is a simple hardcoded IF unit for the  RISE processor. It does not
 -- use the memory and contains a hardcoded programm.
 architecture if_state_behavioral of if_stage is
-  signal if_id_register_int  : IF_ID_REGISTER_T := ( others => ( others => '0' ) );
-  signal if_id_register_next : IF_ID_REGISTER_T := ( others => ( others => '0' ) );
+  signal if_id_register_int  : IF_ID_REGISTER_T := (others => (others => '0'));
+  signal if_id_register_next : IF_ID_REGISTER_T := (others => (others => '0'));
   
 begin
   if_id_register <= if_id_register_int;
@@ -80,10 +81,10 @@ begin
   begin
     if reset = '0' then
       if_id_register_next.pc <= PC_RESET_VECTOR;
-      pc_next <= PC_RESET_VECTOR;
+      pc_next                <= PC_RESET_VECTOR;
     else
       if_id_register_next.pc <= pc;
-      
+
       if stall_in = '0' then
         if branch = '1' then
           pc_next <= branch_target;
@@ -105,20 +106,67 @@ begin
   -- a:   88 00           ld R8,#0x0
   -- c:   98 00           ldhb R8,#0x0
   -- e:   70 08           jmp R8
+  
+--  process (pc)
+--  begin
+--    case pc is
+--      when x"0000" => if_id_register_next.ir <= x"8103";  -- ld R1,#0x3
+--      when x"0002" => if_id_register_next.ir <= x"9101";  -- ldhb R1,#0x1
+--      when x"0004" => if_id_register_next.ir <= x"8230";  -- ld R2,#0x30
+--      when x"0006" => if_id_register_next.ir <= x"8233";  -- ld R2,#0x33
+--      when x"0008" => if_id_register_next.ir <= x"1012";  -- add R1,R2
+--      when x"000A" => if_id_register_next.ir <= x"8800";  -- ld R8,#0x0
+--      when x"000C" => if_id_register_next.ir <= x"9800";  -- ldhb R8,#0x0
+--      when x"000E" => if_id_register_next.ir <= x"7008";  -- jmp R8
+--      when others => if_id_register_next.ir <= x"0000"; -- nop
+--    end case;
+--  end process;
+--
+--Disassembly of section .text:
+--
+
+  --00000000 <reset>:
+  --   0:   83 0c           ld R3,#0xc
+  --   2:   93 00           ldhb R3,#0x0
+  --   4:   84 10           ld R4,#0x10
+  --   6:   94 00           ldhb R4,#0x0
+  --   8:   85 18           ld R5,#0x18
+  --   a:   95 00           ldhb R5,#0x0
+  --
+  --0000000c <loop_start>:
+  --   c:   08 10           ld R1,R0
+  --   e:   81 05           ld R1,#0x5
+  --
+  --00000010 <loop_middle>:
+  --  10:   78 10           tst R1
+  --  12:   72 50           jmpz R5
+  --  14:   28 11           sub R1,#0x1
+  --  16:   70 40           jmp R4
+  --
+  --00000018 <loop_end>:
+  --  18:   70 30           jmp R3
   process (pc)
   begin
     case pc is
-      when x"0000" => if_id_register_next.ir <= x"8103";  -- ld R1,#0x3
-      when x"0002" => if_id_register_next.ir <= x"9101";  -- ldhb R1,#0x1
-      when x"0004" => if_id_register_next.ir <= x"8230";  -- ld R2,#0x30
-      when x"0006" => if_id_register_next.ir <= x"8233";  -- ld R2,#0x33
-      when x"0008" => if_id_register_next.ir <= x"1012";  -- add R1,R2
-      when x"000A" => if_id_register_next.ir <= x"8800";  -- ld R8,#0x0
-      when x"000C" => if_id_register_next.ir <= x"9800";  -- ldhb R8,#0x0
-      when x"000E" => if_id_register_next.ir <= x"7008";  -- jmp R8
-      when others => if_id_register_next.ir <= x"0000"; -- nop
+      when x"0000" => if_id_register_next.ir <= x"830c";  -- ld R3,#0xc
+      when x"0002" => if_id_register_next.ir <= x"9300";  -- ldhb R3,#0x0
+      when x"0004" => if_id_register_next.ir <= x"8410";  -- ld R4,#0x10
+      when x"0006" => if_id_register_next.ir <= x"9400";  -- dhb R4,#0x0
+      when x"0008" => if_id_register_next.ir <= x"8518";  -- ld R5,#0x18
+      when x"000A" => if_id_register_next.ir <= x"9500";  -- ldhb R5,#0x0
+
+      when x"000C" => if_id_register_next.ir <= x"0810";  -- ld R1,R0
+      when x"000E" => if_id_register_next.ir <= x"8105";  -- ld R1,#0x5
+
+      when x"0010" => if_id_register_next.ir <= x"7810";  -- tst R1
+      when x"0012" => if_id_register_next.ir <= x"7250";  -- jmpz R5
+      when x"0014" => if_id_register_next.ir <= x"2811";  -- sub R1,#0x1
+      when x"0016" => if_id_register_next.ir <= x"7040";  -- jmp R4
+      when x"0018" => if_id_register_next.ir <= x"7030";  -- jmp R3
+      when others  => if_id_register_next.ir <= x"0000";  -- nop
     end case;
   end process;
+  
   
 end if_state_behavioral;
 
