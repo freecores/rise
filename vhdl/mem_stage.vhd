@@ -58,7 +58,6 @@ begin  -- mem_stage_rtl
       mem_wb_register_int.aluop1    <= (others => '0');
       mem_wb_register_int.aluop2    <= (others => '0');
       mem_wb_register_int.reg       <= (others => '0');
-      mem_wb_register_int.mem_reg   <= (others => '0');
       mem_wb_register_int.dreg_addr <= (others => '0');
       mem_wb_register_int.lr        <= (others => '0');
       mem_wb_register_int.sr        <= (others => '0');
@@ -69,6 +68,10 @@ begin  -- mem_stage_rtl
 
   process(reset, ex_mem_register)
   begin
+    dmem_addr      <= (others => 'X');
+    dmem_data_out  <= (others => 'X');
+    dmem_wr_enable <= '0';
+
     if reset = '0' then
       mem_wb_register_next.aluop1    <= (others => '0');
       mem_wb_register_next.aluop2    <= (others => '0');
@@ -78,14 +81,10 @@ begin  -- mem_stage_rtl
       mem_wb_register_next.lr        <= (others => '-');
       mem_wb_register_next.sr        <= (others => '-');
     else
-
       -- check if the instruction accesses the memory. if yes then
       -- either load or store data from the memory.
       assert ex_mem_register.aluop1(ALUOP1_LD_MEM_BIT) = '0' or ex_mem_register.aluop1(ALUOP1_ST_MEM_BIT) = '0';
 
-      dmem_addr      <= (others => 'X');
-      dmem_data_out  <= (others => 'X');
-      dmem_wr_enable <= '0';
       if ex_mem_register.aluop1(ALUOP1_LD_MEM_BIT) = '1' then
         dmem_addr <= ex_mem_register.alu;
       end if;
