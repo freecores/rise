@@ -49,7 +49,6 @@ begin  -- wb_stage_rtl
   clear_out <= '0';  -- clear_out output is unused at the moment.
 
   process (reset, mem_wb_register)
-    variable sr_test_value : REGISTER_T;
   begin
     if reset = '0' then
       clear_reg_lock0 <= '0';
@@ -103,15 +102,12 @@ begin  -- wb_stage_rtl
         -- calculate SR value
         sr              <= mem_wb_register.sr;
         if mem_wb_register.aluop1(ALUOP1_LD_MEM_BIT) = '1' then
-          sr_test_value := mem_wb_register.mem_reg;
-        else
-          sr_test_value := mem_wb_register.reg;
-        end if;
-        if sr_test_value = CONV_STD_LOGIC_VECTOR(0, REGISTER_WIDTH) then
-          sr( SR_REGISTER_ZERO ) <= '1';
-        end if;
-        if sr_test_value( REGISTER_WIDTH - 1 ) = '1' then
-          sr( SR_REGISTER_NEGATIVE ) <= '1';
+           if mem_wb_register.mem_reg = CONV_STD_LOGIC_VECTOR(0, REGISTER_WIDTH) then
+             sr( SR_REGISTER_ZERO ) <= '1';
+           end if;
+           if mem_wb_register.mem_reg( REGISTER_WIDTH - 1 ) = '1' then
+             sr( SR_REGISTER_NEGATIVE ) <= '1';
+           end if;            
         end if;
         sr_enable       <= '1';
         clear_reg_lock1 <= '1';
