@@ -9,16 +9,17 @@
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;
-use IEEE.NUMERIC_STD.all;
+use IEEE.STD_LOGIC_ARITH.all;
 
 use WORK.RISE_PACK.all;
-use work.RISE_PACK_SPECIFIC.all;
+
 
 entity dmem is
   
   port (
-    clk       : in  std_logic;
-    reset     : in  std_logic;
+    clk   : in std_logic;
+    reset : in std_logic;
+
     wr_enable : in  std_logic;
     addr      : in  MEM_ADDR_T;
     data_in   : in  MEM_DATA_T;
@@ -27,6 +28,7 @@ entity dmem is
 end dmem;
 
 architecture dmem_rtl of dmem is
+
   component idmem
     port (
       addr  : in  std_logic_vector(11 downto 0);
@@ -38,6 +40,7 @@ architecture dmem_rtl of dmem is
   end component;
 
 begin  -- dmem_rtl
+
   DATA_MEM : idmem
     port map (
       addr  => addr(11 downto 0),
@@ -46,6 +49,8 @@ begin  -- dmem_rtl
       dout  => data_out,
       sinit => reset,
       we    => wr_enable);
+
+
 end dmem_rtl;
 
 
