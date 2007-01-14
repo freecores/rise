@@ -268,7 +268,7 @@ begin  -- id_stage_rtl
   end process;
 
   -- Check if all registers are available. If not stall the pipeline.
-  lock : process(reset, id_ex_register_next, rx_addr_int, ry_addr_int, rz_addr_int, lock_register )
+  lock : process(reset, id_ex_register_next, rx_addr_int, ry_addr_int, rz_addr_int, lock_register, clear_in )
     variable required : LOCK_REGISTER_T;
   begin
     required := (others => '0');
