@@ -115,7 +115,7 @@ begin
       when x"0008" => if_id_register_next.ir <= x"1012";  -- add R1,R2
       when x"000A" => if_id_register_next.ir <= x"8800";  -- ld R8,#0x0
       when x"000C" => if_id_register_next.ir <= x"9800";  -- ldhb R8,#0x0
-      when x"7008" => if_id_register_next.ir <= x"7008";  -- jmp R8
+      when x"000E" => if_id_register_next.ir <= x"7008";  -- jmp R8
       when others => if_id_register_next.ir <= x"0000"; -- nop
     end case;
   end process;
