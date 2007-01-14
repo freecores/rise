@@ -31,7 +31,8 @@ entity ex_stage is
     branch              : out std_logic;
     stall_in            : in std_logic;
     clear_in            : in std_logic;
-    clear_out           : out std_logic);
+    clear_out           : out std_logic;
+    clear_locks         : out std_logic);
 
 end ex_stage;
 
@@ -200,7 +201,7 @@ begin  -- ex_stage_rtl
     
     isLoadOp <= '0';
     isJmpOp <= '0';
-    
+  
     case id_ex_register.opcode is
       -- load opcodes
       when OPCODE_LD_IMM =>
@@ -317,9 +318,11 @@ begin  -- ex_stage_rtl
   begin  -- process branch_logic
     branch_int <= '0';
     clear_out_int <= '0';
+    clear_locks <= '0';
     if (id_ex_register.rX_addr = PC_ADDR and isLoadOp = '1') or (isJmpOp = '1') then
       branch_int <= '1';
       clear_out_int <= '1';
+      clear_locks <= '1';
     end if;
   end process branch_logic;
   
