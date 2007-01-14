@@ -8,6 +8,9 @@
 -- Execute stage
 -------------------------------------------------------------------------------
 
+library UNISIM;
+use UNISIM.vcomponents.all;
+
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use IEEE.std_logic_signed.all;
@@ -32,6 +35,8 @@ entity ex_stage is
 
 end ex_stage;
 
+
+
 architecture ex_stage_rtl of ex_stage is
 
 --  signal id_ex_register : ID_EX_REGISTER_T;
@@ -48,6 +53,10 @@ architecture ex_stage_rtl of ex_stage is
   signal clear_out_int : std_logic;
   signal branch_int : std_logic;
 
+  signal bs_arithmetic : std_logic;
+  signal bs_left : std_logic;
+  signal bs_out : REGISTER_T;
+  
   function isOverflowAdd (
     op1 : std_logic_vector;
     op2 : std_logic_vector;
@@ -83,10 +92,27 @@ architecture ex_stage_rtl of ex_stage is
     return x;
   end isOverflowSub;
 
+  component barrel_shifter
+    port(
+      reg_a      : in  std_logic_vector(15 downto 0);
+      reg_b      : in  std_logic_vector(15 downto 0);
+      left       : in  std_logic;
+      arithmetic : in  std_logic;
+      reg_q      : out std_logic_vector(15 downto 0)
+      );
+  end component;
 begin  -- ex_stage_rtl
 
   ex_mem_register        <= ex_mem_register_int;
   
+  bs : barrel_shifter port map(
+    reg_a      => id_ex_register.rX,
+    reg_b      => id_ex_register.rY,
+    left       => bs_left,
+    arithmetic => bs_arithmetic,
+    reg_q      => bs_out
+    );
+
   output: process (clk, reset)
   begin  -- process
     if reset = '0' then                 -- asynchronous reset (active low)
@@ -157,7 +183,7 @@ begin  -- ex_stage_rtl
     end if;    
   end process aluop;
   
-  alu: process (id_ex_register, ex_mem_register_next)
+  alu: process (id_ex_register, ex_mem_register_next, bs_out)
   begin
 
     ex_mem_register_next.alu <= (others => '0');
@@ -225,14 +251,24 @@ begin  -- ex_stage_rtl
                                                                   ex_mem_register_next.alu);
       when OPCODE_NEG =>
         ex_mem_register_next.alu <= not id_ex_register.rY + x"0001";
+--      when OPCODE_ALS =>
+--        ex_mem_register_next.alu <= id_ex_register.rY(REGISTER_WIDTH-2 downto 0) & "0";
+--        ex_mem_register_next.sr(SR_OVERFLOW_BIT) <= id_ex_register.rY(REGISTER_WIDTH-1) xor
+--                                                    id_ex_register.rY(REGISTER_WIDTH-2);
+--      when OPCODE_ARS =>
+--        ex_mem_register_next.alu <= id_ex_register.rY(REGISTER_WIDTH-1) & id_ex_register.rY(REGISTER_WIDTH-1 downto 1);
       when OPCODE_ALS =>
-        ex_mem_register_next.alu <= id_ex_register.rY(REGISTER_WIDTH-2 downto 0) & "0";
+        bs_left                                  <= '1';
+        bs_arithmetic                            <= '1';
+        ex_mem_register_next.alu                 <= bs_out;
         ex_mem_register_next.sr(SR_OVERFLOW_BIT) <= id_ex_register.rY(REGISTER_WIDTH-1) xor
                                                     id_ex_register.rY(REGISTER_WIDTH-2);
       when OPCODE_ARS =>
-        ex_mem_register_next.alu <= id_ex_register.rY(REGISTER_WIDTH-1) & id_ex_register.rY(REGISTER_WIDTH-1 downto 1);
-        
-
+        bs_left                                  <= '0';
+        bs_arithmetic                            <= '1';
+        ex_mem_register_next.alu                 <= bs_out;
+        ex_mem_register_next.sr(SR_OVERFLOW_BIT) <= id_ex_register.rY(REGISTER_WIDTH-1) xor
+                                                    id_ex_register.rY(REGISTER_WIDTH-2);
         -- logical opcodes
       when OPCODE_AND =>
         ex_mem_register_next.alu <= id_ex_register.rX and id_ex_register.rY;            
@@ -240,11 +276,18 @@ begin  -- ex_stage_rtl
         ex_mem_register_next.alu <= not id_ex_register.rY;            
       when OPCODE_EOR =>
         ex_mem_register_next.alu <= id_ex_register.rX xor id_ex_register.rY;            
+--      when OPCODE_LS =>
+--        ex_mem_register_next.alu <= id_ex_register.rY(REGISTER_WIDTH-2 downto 0) & "0";
+--      when OPCODE_RS =>
+--        ex_mem_register_next.alu <= "0" & id_ex_register.rY(REGISTER_WIDTH-1 downto 1);
       when OPCODE_LS =>
-        ex_mem_register_next.alu <= id_ex_register.rY(REGISTER_WIDTH-2 downto 0) & "0";
+        bs_left                  <= '1';
+        bs_arithmetic            <= '0';
+        ex_mem_register_next.alu <= bs_out;
       when OPCODE_RS =>
-        ex_mem_register_next.alu <= "0" & id_ex_register.rY(REGISTER_WIDTH-1 downto 1);
-
+        bs_left                  <= '0';
+        bs_arithmetic            <= '0';
+        ex_mem_register_next.alu <= bs_out;
         -- program control
       when OPCODE_JMP =>
         ex_mem_register_next.lr             <= id_ex_register.pc;
