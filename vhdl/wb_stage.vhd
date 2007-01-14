@@ -51,19 +51,18 @@ begin  -- wb_stage_rtl
   process (reset, mem_wb_register)
   begin
     if reset = '0' then
-      sr_enable   <= '0';
-      lr_enable   <= '0';
-      dreg_enable <= '0';
-
       clear_reg_lock0 <= '0';
-      lock_reg_addr0  <= (others => '-');
+      lock_reg_addr0  <= (others => 'X');
       clear_reg_lock1 <= '0';
-      lock_reg_addr1  <= (others => '-');
+      lock_reg_addr1  <= (others => 'X');
 
-      dreg_addr <= (others => '-');
-      dreg      <= (others => '-');
-      lr        <= (others => '-');
-      sr        <= (others => '-');
+      dreg_enable <= '0';
+      dreg_addr <= (others => 'X');
+      dreg      <= (others => 'X');
+      lr_enable   <= '0';
+      lr        <= (others => 'X');
+      sr_enable   <= '0';
+      sr        <= (others => 'X');
     else
 
       -- write back of register value. --
@@ -76,17 +75,17 @@ begin  -- wb_stage_rtl
       elsif mem_wb_register.aluop1(ALUOP1_LD_MEM_BIT) = '1' then
         dreg <= mem_wb_register.mem_reg;
       else
-        dreg            <= (others => '0');
         dreg_enable     <= '0';
+        dreg            <= (others => 'X');
         clear_reg_lock0 <= '0';
-        lock_reg_addr0  <= (others => '-');
+        lock_reg_addr0  <= (others => 'X');
       end if;
 
       -- we have only one lock register.
       assert mem_wb_register.aluop2(ALUOP2_SR_BIT) = '0' or mem_wb_register.aluop2(ALUOP2_LR_BIT) = '0';
 
       clear_reg_lock1 <= '0';
-      lock_reg_addr1  <= (others => '-');
+      lock_reg_addr1  <= (others => 'X');
       -- write back of LR --
       if mem_wb_register.aluop2(ALUOP2_LR_BIT) = '1' then
         lr              <= mem_wb_register.lr;
