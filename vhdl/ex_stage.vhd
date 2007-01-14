@@ -93,6 +93,20 @@ architecture ex_stage_rtl of ex_stage is
     return x;
   end isOverflowSub;
 
+  procedure getSRStatusBits ( value : in REGISTER_T; sr_reg : out SR_REGISTER_T ) is
+  begin
+    if value = CONV_STD_LOGIC_VECTOR(0, REGISTER_WIDTH) then
+      sr_reg( SR_REGISTER_ZERO ) := '1';
+    else
+      sr_reg( SR_REGISTER_ZERO ) := '0';
+    end if;
+    if value( REGISTER_WIDTH - 1 ) = '1' then
+      sr_reg( SR_REGISTER_NEGATIVE ) := '1';
+    else
+      sr_reg( SR_REGISTER_NEGATIVE ) := '0';
+    end if;
+  end getSRStatusBits;
+  
   component barrel_shifter
     port(
       reg_a      : in  std_logic_vector(15 downto 0);
@@ -185,14 +199,15 @@ begin  -- ex_stage_rtl
   end process aluop;
   
   alu: process (id_ex_register, ex_mem_register_next, bs_out)
+    variable new_sr : SR_REGISTER_T;
   begin
 
+    new_sr := id_ex_register.sr;
     ex_mem_register_next.alu <= (others => '0');
     ex_mem_register_next.dreg_addr <= id_ex_register.rX_addr;
     ex_mem_register_next.reg <= (others => '0');
     ex_mem_register_next.lr <= (others => '0');
-    ex_mem_register_next.sr <= (others => '0');
-    
+        
     aluop1_int(ALUOP1_LD_MEM_BIT) <= '0';
     aluop1_int(ALUOP1_ST_MEM_BIT) <= '0';
     aluop1_int(ALUOP1_WB_REG_BIT) <= '1';
@@ -206,9 +221,11 @@ begin  -- ex_stage_rtl
       -- load opcodes
       when OPCODE_LD_IMM =>
         ex_mem_register_next.alu <= x"00" & id_ex_register.immediate(7 downto 0);
+        getSRStatusBits( ex_mem_register_next.alu, new_sr );
         isLoadOp <= '1';
       when OPCODE_LD_IMM_HB =>
         ex_mem_register_next.alu <= id_ex_register.rX or (id_ex_register.immediate(7 downto 0) & x"00");
+        getSRStatusBits( ex_mem_register_next.alu, new_sr );
         isLoadOp <= '1';
       when OPCODE_LD_DISP =>
         ex_mem_register_next.alu <= id_ex_register.rY + id_ex_register.rZ;
@@ -226,32 +243,38 @@ begin  -- ex_stage_rtl
       when OPCODE_ST_DISP =>
         ex_mem_register_next.alu <= id_ex_register.rY + id_ex_register.rZ;
         ex_mem_register_next.reg <= id_ex_register.rX;
+        getSRStatusBits( ex_mem_register_next.reg, new_sr );
         aluop1_int(ALUOP1_ST_MEM_BIT) <= '1';
         aluop2_int(ALUOP2_SR_BIT) <= '0';
         
         -- arithmetic opcodes
       when OPCODE_ADD =>
         ex_mem_register_next.alu <= id_ex_register.rX + id_ex_register.rY;
-        ex_mem_register_next.sr(SR_OVERFLOW_BIT) <= isOverflowAdd(id_ex_register.rX,
-                                                                  id_ex_register.rY,
-                                                                  ex_mem_register_next.alu);
+        getSRStatusBits( ex_mem_register_next.alu, new_sr );
+        new_sr(SR_OVERFLOW_BIT) := isOverflowAdd(id_ex_register.rX,
+                                                 id_ex_register.rY,
+                                                 ex_mem_register_next.alu);
       when OPCODE_ADD_IMM =>
         ex_mem_register_next.alu <= id_ex_register.rX + id_ex_register.immediate;
-        ex_mem_register_next.sr(SR_OVERFLOW_BIT) <= isOverflowAdd(id_ex_register.rX,
-                                                                  id_ex_register.immediate,
-                                                                  ex_mem_register_next.alu);
+        getSRStatusBits( ex_mem_register_next.alu, new_sr );
+        new_sr(SR_OVERFLOW_BIT) := isOverflowAdd(id_ex_register.rX,
+                                                id_ex_register.immediate,
+                                                ex_mem_register_next.alu);
       when OPCODE_SUB =>
         ex_mem_register_next.alu <= id_ex_register.rX - id_ex_register.rY;
-        ex_mem_register_next.sr(SR_OVERFLOW_BIT) <= isOverflowSub(id_ex_register.rX,
-                                                                  id_ex_register.rY,
-                                                                  ex_mem_register_next.alu);
+        getSRStatusBits( ex_mem_register_next.alu, new_sr );
+        new_sr(SR_OVERFLOW_BIT) := isOverflowSub(id_ex_register.rX,
+                                                 id_ex_register.rY,
+                                                 ex_mem_register_next.alu);
       when OPCODE_SUB_IMM =>
         ex_mem_register_next.alu <= id_ex_register.rX - id_ex_register.immediate;
-        ex_mem_register_next.sr(SR_OVERFLOW_BIT) <= isOverflowSub(id_ex_register.rX,
-                                                                  id_ex_register.immediate,
-                                                                  ex_mem_register_next.alu);
+        getSRStatusBits( ex_mem_register_next.reg, new_sr );
+        new_sr(SR_OVERFLOW_BIT) := isOverflowSub(id_ex_register.rX,
+                                                 id_ex_register.immediate,
+                                                 ex_mem_register_next.alu);
       when OPCODE_NEG =>
         ex_mem_register_next.alu <= not id_ex_register.rY + x"0001";
+        getSRStatusBits( ex_mem_register_next.alu, new_sr );
 --      when OPCODE_ALS =>
 --        ex_mem_register_next.alu <= id_ex_register.rY(REGISTER_WIDTH-2 downto 0) & "0";
 --        ex_mem_register_next.sr(SR_OVERFLOW_BIT) <= id_ex_register.rY(REGISTER_WIDTH-1) xor
@@ -259,24 +282,29 @@ begin  -- ex_stage_rtl
 --      when OPCODE_ARS =>
 --        ex_mem_register_next.alu <= id_ex_register.rY(REGISTER_WIDTH-1) & id_ex_register.rY(REGISTER_WIDTH-1 downto 1);
       when OPCODE_ALS =>
-        bs_left                                  <= '1';
-        bs_arithmetic                            <= '1';
-        ex_mem_register_next.alu                 <= bs_out;
-        ex_mem_register_next.sr(SR_OVERFLOW_BIT) <= id_ex_register.rY(REGISTER_WIDTH-1) xor
-                                                    id_ex_register.rY(REGISTER_WIDTH-2);
+        bs_left                  <= '1';
+        bs_arithmetic            <= '1';
+        ex_mem_register_next.alu <= bs_out;
+        getSRStatusBits( bs_out, new_sr );
+        new_sr(SR_OVERFLOW_BIT)  := id_ex_register.rY(REGISTER_WIDTH-1) xor
+                                    id_ex_register.rY(REGISTER_WIDTH-2);
       when OPCODE_ARS =>
-        bs_left                                  <= '0';
-        bs_arithmetic                            <= '1';
-        ex_mem_register_next.alu                 <= bs_out;
-        ex_mem_register_next.sr(SR_OVERFLOW_BIT) <= id_ex_register.rY(REGISTER_WIDTH-1) xor
-                                                    id_ex_register.rY(REGISTER_WIDTH-2);
+        bs_left                  <= '0';
+        bs_arithmetic            <= '1';
+        ex_mem_register_next.alu <= bs_out;
+        getSRStatusBits( bs_out, new_sr );
+        new_sr(SR_OVERFLOW_BIT)  := id_ex_register.rY(REGISTER_WIDTH-1) xor
+                                    id_ex_register.rY(REGISTER_WIDTH-2);
         -- logical opcodes
       when OPCODE_AND =>
-        ex_mem_register_next.alu <= id_ex_register.rX and id_ex_register.rY;            
+        ex_mem_register_next.alu <= id_ex_register.rX and id_ex_register.rY;
+        getSRStatusBits( ex_mem_register_next.alu, new_sr );
       when OPCODE_NOT =>
-        ex_mem_register_next.alu <= not id_ex_register.rY;            
+        ex_mem_register_next.alu <= not id_ex_register.rY;
+        getSRStatusBits( ex_mem_register_next.alu, new_sr );        
       when OPCODE_EOR =>
         ex_mem_register_next.alu <= id_ex_register.rX xor id_ex_register.rY;            
+        getSRStatusBits( ex_mem_register_next.alu, new_sr );
 --      when OPCODE_LS =>
 --        ex_mem_register_next.alu <= id_ex_register.rY(REGISTER_WIDTH-2 downto 0) & "0";
 --      when OPCODE_RS =>
@@ -285,15 +313,18 @@ begin  -- ex_stage_rtl
         bs_left                  <= '1';
         bs_arithmetic            <= '0';
         ex_mem_register_next.alu <= bs_out;
+        getSRStatusBits( bs_out, new_sr );
       when OPCODE_RS =>
         bs_left                  <= '0';
         bs_arithmetic            <= '0';
         ex_mem_register_next.alu <= bs_out;
+        getSRStatusBits( bs_out, new_sr );
         -- program control
       when OPCODE_JMP =>
         ex_mem_register_next.lr             <= id_ex_register.pc;
         ex_mem_register_next.dreg_addr      <= PC_ADDR;
         ex_mem_register_next.alu            <= id_ex_register.rX;
+        getSRStatusBits( ex_mem_register_next.alu, new_sr );
         aluop1_int(ALUOP1_WB_REG_BIT) <= '0';
         aluop2_int(ALUOP2_SR_BIT) <= '0';
         aluop2_int(ALUOP2_LR_BIT) <= '1';
@@ -306,12 +337,16 @@ begin  -- ex_stage_rtl
       when OPCODE_TST =>
         aluop1_int(ALUOP1_WB_REG_BIT) <= '0';
         aluop2_int(ALUOP2_SR_BIT) <= '1';
+        getSRStatusBits( id_ex_register.rX, new_sr );
         
       when others =>
         aluop1_int(ALUOP1_WB_REG_BIT) <= '0';
         aluop2_int(ALUOP2_SR_BIT) <= '0';
         
     end case;
+    
+    -- update current SR register value.
+    ex_mem_register_next.sr <= new_sr;
   end process;
 
   branch_logic: process (id_ex_register, isLoadOp, isJmpOp)
