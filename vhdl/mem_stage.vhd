@@ -99,7 +99,7 @@ begin  -- mem_stage_rtl
       -- other values are pass through
       mem_wb_register_next.aluop1    <= ex_mem_register.aluop1;
       mem_wb_register_next.aluop2    <= ex_mem_register.aluop2;
-      mem_wb_register_next.reg       <= ex_mem_register.reg;
+      mem_wb_register_next.reg       <= ex_mem_register.alu;
       mem_wb_register_next.dreg_addr <= ex_mem_register.dreg_addr;
       mem_wb_register_next.lr        <= ex_mem_register.lr;
       mem_wb_register_next.sr        <= ex_mem_register.sr;
