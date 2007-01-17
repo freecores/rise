@@ -66,7 +66,7 @@ begin  -- mem_stage_rtl
     end if;
   end process;
 
-  process(reset, ex_mem_register)
+  process( reset, ex_mem_register, dmem_data_in )
   begin
     dmem_addr      <= (others => 'X');
     dmem_data_out  <= (others => 'X');
