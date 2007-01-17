@@ -12,7 +12,7 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use IEEE.NUMERIC_STD.all;
 use WORK.RISE_PACK.all;
-use work.RISE_PACK_SPECIFIC.all;
+use WORK.RISE_PACK_SPECIFIC.all;
 
 entity if_stage is
   
@@ -148,30 +148,60 @@ begin
   --
   --00000018 <loop_end>:
   --  18:   70 30           jmp R3
+--  
+--  process (cur_pc)
+--  begin
+--    case cur_pc is
+--      when x"0000" => if_id_register_next.ir <= x"830c";  -- ld R3,#0xc
+--      when x"0002" => if_id_register_next.ir <= x"9300";  -- ldhb R3,#0x0
+--      when x"0004" => if_id_register_next.ir <= x"8410";  -- ld R4,#0x10
+--      when x"0006" => if_id_register_next.ir <= x"9400";  -- dhb R4,#0x0
+--      when x"0008" => if_id_register_next.ir <= x"8518";  -- ld R5,#0x18
+--      when x"000A" => if_id_register_next.ir <= x"9500";  -- ldhb R5,#0x0
+--
+--      when x"000C" => if_id_register_next.ir <= x"0810";  -- ld R1,R0
+--      when x"000E" => if_id_register_next.ir <= x"8105";  -- ld R1,#0x5
+--
+--      when x"0010" => if_id_register_next.ir <= x"7810";  -- tst R1
+--      when x"0012" => if_id_register_next.ir <= x"7250";  -- jmpz R5
+--      when x"0014" => if_id_register_next.ir <= x"2811";  -- sub R1,#0x1
+--      when x"0016" => if_id_register_next.ir <= x"7040";  -- jmp R4
+--      when x"0018" => if_id_register_next.ir <= x"7030";  -- jmp R3
+--      when others  => if_id_register_next.ir <= x"0000";  -- nop
+--    end case;
+--  end process;
+  
+  --Disassembly of section .text:
+  --
+  --00000000 <reset>:
+  --   0:   81 00           ld R1,#0x0
+  --   2:   91 10           ldhb R1,#0x10
+  --   4:   e0 01           st R0,[R1]
+  --   6:   82 0a           ld R2,#0xa
+  --   8:   92 00           ldhb R2,#0x0
+  --
+  --0000000a <loop>:
+  --   a:   a0 31           ld R3,[R1]
+  --   c:   18 31           add R3,#0x1
+  --   e:   e0 31           st R3,[R1]
+  --  10:   70 20           jmp R2  
   
   process (cur_pc)
   begin
     case cur_pc is
-      when x"0000" => if_id_register_next.ir <= x"830c";  -- ld R3,#0xc
-      when x"0002" => if_id_register_next.ir <= x"9300";  -- ldhb R3,#0x0
-      when x"0004" => if_id_register_next.ir <= x"8410";  -- ld R4,#0x10
-      when x"0006" => if_id_register_next.ir <= x"9400";  -- dhb R4,#0x0
-      when x"0008" => if_id_register_next.ir <= x"8518";  -- ld R5,#0x18
-      when x"000A" => if_id_register_next.ir <= x"9500";  -- ldhb R5,#0x0
+      when x"0000" => if_id_register_next.ir <= x"8100";  -- ld R1,#0x0
+      when x"0002" => if_id_register_next.ir <= x"9110";  -- ldhb R1,#0x10
+      when x"0004" => if_id_register_next.ir <= x"e001";  -- st R0,[R1]
+      when x"0006" => if_id_register_next.ir <= x"820a";  -- ld R2,#0xa
+      when x"0008" => if_id_register_next.ir <= x"9200";  -- ldhb R2,#0x0
 
-      when x"000C" => if_id_register_next.ir <= x"0810";  -- ld R1,R0
-      when x"000E" => if_id_register_next.ir <= x"8105";  -- ld R1,#0x5
-
-      when x"0010" => if_id_register_next.ir <= x"7810";  -- tst R1
-      when x"0012" => if_id_register_next.ir <= x"7250";  -- jmpz R5
-      when x"0014" => if_id_register_next.ir <= x"2811";  -- sub R1,#0x1
-      when x"0016" => if_id_register_next.ir <= x"7040";  -- jmp R4
-      when x"0018" => if_id_register_next.ir <= x"7030";  -- jmp R3
+      when x"000A" => if_id_register_next.ir <= x"a031";  -- ld R3,[R1]
+      when x"000C" => if_id_register_next.ir <= x"1831";  -- add R3,#0x1
+      when x"000E" => if_id_register_next.ir <= x"e031";  -- st R3,[R1]
+      when x"0010" => if_id_register_next.ir <= x"7020";  -- jmp R2  
       when others  => if_id_register_next.ir <= x"0000";  -- nop
     end case;
-  end process;
-  
-  
+  end process;  
 end if_state_behavioral;
 
 
