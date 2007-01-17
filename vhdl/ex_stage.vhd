@@ -247,6 +247,7 @@ begin  -- ex_stage_rtl
         getSRStatusBits( ex_mem_register_next.reg, new_sr );
         aluop1_int(ALUOP1_ST_MEM_BIT) <= '1';
         aluop2_int(ALUOP2_SR_BIT) <= '0';
+        aluop1_int(ALUOP1_WB_REG_BIT) <= '0';
         
         -- arithmetic opcodes
       when OPCODE_ADD =>
