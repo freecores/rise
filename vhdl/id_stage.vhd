@@ -128,7 +128,7 @@ begin  -- id_stage_rtl
 
   -- The opc_extender decodes the two different formats used for the opcodes
   -- in the instruction set into a single 5-bit opcode format.
-  opc_extender : process (clk, reset, if_id_register )
+  opc_extender : process (clk, reset, if_id_register)
   begin
     if reset = '0' then
       id_ex_register_next.opcode <= OPCODE_NOP;
@@ -144,7 +144,7 @@ begin  -- id_stage_rtl
     end if;
   end process;
 
-  cond_decode : process (clk, reset, if_id_register )
+  cond_decode : process (clk, reset, if_id_register)
   begin
     if reset = '0' then
       id_ex_register_next.cond <= COND_UNCONDITIONAL;
@@ -160,7 +160,7 @@ begin  -- id_stage_rtl
     end if;
   end process;
 
-  pc : process(reset, if_id_register )
+  pc : process(reset, if_id_register)
   begin
     if reset = '0' then
       id_ex_register_next.pc <= RESET_PC_VALUE;
@@ -172,7 +172,7 @@ begin  -- id_stage_rtl
   -- The SR fetch process read the value of the SR registers and passes it to
   -- the execute pipeline. In addition it checks if the opcode modifies the
   -- SR register and if yes locks the register.
-  sr_fetch : process (reset, sr, id_ex_register_next, stall_out_int, clear_in )
+  sr_fetch : process (reset, sr, id_ex_register_next, stall_out_int, clear_in)
   begin
     if reset = '0' then
       id_ex_register_next.sr <= RESET_SR_VALUE;
@@ -189,7 +189,7 @@ begin  -- id_stage_rtl
     end if;
   end process;
 
-  rx_decode_and_fetch : process (reset, if_id_register, id_ex_register_next, rx, stall_out_int, clear_in )
+  rx_decode_and_fetch : process (reset, if_id_register, id_ex_register_next, rx, stall_out_int, clear_in)
   begin
     -- make sure we don't synthesize a latch for rx_addr
     rx_addr_int <= (others => '0');
@@ -221,7 +221,7 @@ begin  -- id_stage_rtl
   end process;
 
 
-  ry_decode_and_fetch : process (reset, if_id_register, id_ex_register_next, ry )
+  ry_decode_and_fetch : process (reset, if_id_register, id_ex_register_next, ry)
   begin
     -- make sure we don't synthesize a latch for ry_addr_int
     ry_addr_int <= (others => '0');
@@ -234,7 +234,7 @@ begin  -- id_stage_rtl
     end if;
   end process;
 
-  rz_decode_and_fetch : process (reset, if_id_register, id_ex_register_next, rz )
+  rz_decode_and_fetch : process (reset, if_id_register, id_ex_register_next, rz)
   begin
     -- make sure we don't synthesize a latch for rz_addr_int
     rz_addr_int <= (others => '0');
@@ -268,7 +268,7 @@ begin  -- id_stage_rtl
   end process;
 
   -- Check if all registers are available. If not stall the pipeline.
-  lock : process(reset, id_ex_register_next, rx_addr_int, ry_addr_int, rz_addr_int, lock_register, clear_in )
+  lock : process(reset, id_ex_register_next, rx_addr_int, ry_addr_int, rz_addr_int, lock_register, clear_in)
     variable required : LOCK_REGISTER_T;
   begin
     required := (others => '0');
@@ -296,24 +296,36 @@ begin  -- id_stage_rtl
         required(TO_INTEGER(unsigned(rz_addr_int))) := '1';
         required(TO_INTEGER(unsigned(ry_addr_int))) := '1';
       when OPCODE_ADD =>
+        required(TO_INTEGER(unsigned(rx_addr_int))) := '1';
         required(TO_INTEGER(unsigned(ry_addr_int))) := '1';
+      when OPCODE_ADD_IMM =>
+        required(TO_INTEGER(unsigned(rx_addr_int))) := '1';
       when OPCODE_SUB =>
+        required(TO_INTEGER(unsigned(rx_addr_int))) := '1';
         required(TO_INTEGER(unsigned(ry_addr_int))) := '1';
+      when OPCODE_SUB_IMM =>
+        required(TO_INTEGER(unsigned(rx_addr_int))) := '1';
       when OPCODE_NEG =>
         required(TO_INTEGER(unsigned(ry_addr_int))) := '1';
       when OPCODE_ARS =>
+        required(TO_INTEGER(unsigned(rx_addr_int))) := '1';
         required(TO_INTEGER(unsigned(ry_addr_int))) := '1';
       when OPCODE_ALS =>
+        required(TO_INTEGER(unsigned(rx_addr_int))) := '1';
         required(TO_INTEGER(unsigned(ry_addr_int))) := '1';
       when OPCODE_AND =>
+        required(TO_INTEGER(unsigned(rx_addr_int))) := '1';
         required(TO_INTEGER(unsigned(ry_addr_int))) := '1';
       when OPCODE_NOT =>
         required(TO_INTEGER(unsigned(ry_addr_int))) := '1';
       when OPCODE_EOR =>
+        required(TO_INTEGER(unsigned(rx_addr_int))) := '1';
         required(TO_INTEGER(unsigned(ry_addr_int))) := '1';
       when OPCODE_LS =>
+        required(TO_INTEGER(unsigned(rx_addr_int))) := '1';
         required(TO_INTEGER(unsigned(ry_addr_int))) := '1';
       when OPCODE_RS =>
+        required(TO_INTEGER(unsigned(rx_addr_int))) := '1';
         required(TO_INTEGER(unsigned(ry_addr_int))) := '1';
       when OPCODE_JMP =>
         required(TO_INTEGER(unsigned(rx_addr_int))) := '1';
