@@ -50,6 +50,7 @@ architecture wb_stage_rtl of wb_stage is
    signal rdy_cnt	:std_logic_vector(1 downto 0);
    signal txd		:std_logic;
    signal rxd		:std_logic;
+	signal sendtouart	:std_logic;
 		
     component sc_uart is
       generic (ADDR_BITS : integer;
@@ -119,13 +120,17 @@ begin  -- wb_stage_rtl
       lr        <= (others => 'X');
       sr_enable   <= '0';
       sr        <= (others => 'X');
+--		uart reset
 		rd 		<= '0';
 		wr 		<= '0';
       wr_data        <= (others => 'X');
 		rd_data        <= (others => '0');
-
+		sendtouart	<='0'
 	 else
-
+		if sendtouart = '1' then
+			wr_data <= 	mem_wb_register.reg;
+			wr <= '1';
+		end if;		
       -- write back of register value. --
       dreg_addr <= mem_wb_register.dreg_addr;
       if mem_wb_register.aluop1(ALUOP1_WB_REG_BIT) = '1' then
