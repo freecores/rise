@@ -51,8 +51,6 @@ architecture wb_stage_rtl of wb_stage is
    signal txd		:std_logic;
    signal rxd		:std_logic;
 		
-	
-	
     component sc_uart is
       generic (ADDR_BITS : integer;
                CLK_FREQ  : integer;
@@ -103,6 +101,9 @@ begin  -- wb_stage_rtl
 		
   clear_out <= '0';  -- clear_out output is unused at the moment.
 
+  
+
+
   process (reset, mem_wb_register)
   begin
     if reset = '0' then
@@ -118,7 +119,12 @@ begin  -- wb_stage_rtl
       lr        <= (others => 'X');
       sr_enable   <= '0';
       sr        <= (others => 'X');
-    else
+		rd 		<= '0';
+		wr 		<= '0';
+      wr_data        <= (others => 'X');
+		rd_data        <= (others => '0');
+
+	 else
 
       -- write back of register value. --
       dreg_addr <= mem_wb_register.dreg_addr;
