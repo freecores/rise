@@ -119,5 +119,8 @@ package RISE_PACK is
                               sr            : SR_REGISTER_T;
                             end record;
   
+
+   constant CONST_ADDRESS: x"8001";
+
 end RISE_PACK;
 
