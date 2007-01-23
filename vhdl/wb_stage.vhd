@@ -74,30 +74,6 @@ architecture wb_stage_rtl of wb_stage is
     end component;
 
 begin  -- wb_stage_rtl
-  -- Uart modul einbinden
-  UART : sc_uart generic map (
-    ADDR_BITS => 2,
-    CLK_FREQ  => CLK_FREQ,
-    BAUD_RATE => 115200,
-    TXF_DEPTH => 2,
-    TXF_THRES => 1,
-    RXF_DEPTH => 2,
-    RXF_THRES => 1
-    )
-	 port map(
-      CLK     => clk,
-      RESET   => reset,
-      ADDRESS => address(1 downto 0),
-      WR_DATA => wr_data,
-      RD      => rd,
-      WR      => wr,
-      RD_DATA => rd_data,
-      RDY_CNT => rdy_cnt,
-      TXD     => txd,
-      RXD     => rxd,
-      NCTS    => '0',
-      NRTS    => open
-      );
 		
 		
   clear_out <= '0';  -- clear_out output is unused at the moment.
@@ -120,22 +96,8 @@ begin  -- wb_stage_rtl
       lr        <= (others => 'X');
       sr_enable   <= '0';
       sr        <= (others => 'X');
---		uart reset
-		rd 		<= '0';
-		wr 		<= '0';
-      wr_data        <= (others => 'X');
-		rd_data        <= (others => '0');
 	 else
-		if mem_wb_register.dreg_addr = '0' then
-			address <=x"8001";
-			rd <= '0';
-			wr <= '1';
-			wr_data <= 	mem_wb_register.reg;
-		else
-			rd <= '0';
-			wr <= '0';
-		end if;
-		
+
       -- write back of register value. --
       dreg_addr <= mem_wb_register.dreg_addr;
       if mem_wb_register.aluop1(ALUOP1_WB_REG_BIT) = '1' then
