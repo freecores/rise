@@ -54,7 +54,7 @@ begin
 
 	full <= f;
 
-	if (reset='1') then
+	if (reset='0') then
 
 		buf <= (others => '0');
 		f <= '0';
