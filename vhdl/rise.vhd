@@ -79,7 +79,9 @@ architecture rise_rtl of rise is
   signal data_in_imem_sig          : MEM_DATA_T;  -- unused at the moment
   signal wr_enable_imem_sig        : std_logic;   -- unused at the moment
   -- dmem signals
-  signal wr_enable_dmem_sig        : std_logic;
+  signal wr_enable_dmem_sig        : std_logic;	
+  signal dmem_rxd_sig      		  : std_logic;
+  signal dmem_txd_sig        		  : std_logic;
   -- rlu signals
   signal clear_lock0_sig      : std_logic := '0';
   signal clear_lock_addr0_sig : REGISTER_ADDR_T;
@@ -240,10 +242,12 @@ architecture rise_rtl of rise is
     port (
       clk            : in std_logic;
       reset          : in std_logic;
-      wr_enable	     : in std_logic;
+      wr_enable	   : in std_logic;
       addr           : in MEM_ADDR_T;
       data_in        : in MEM_DATA_T;
-      data_out       : out MEM_DATA_T);
+      data_out       : out MEM_DATA_T;
+		uart_txd 		: out std_logic;
+		uart_rxd 		: in std_logic);
   end component;
 
   component rlu   
@@ -414,7 +418,9 @@ begin  -- rise_rtl
       wr_enable      => wr_enable_dmem_sig,
       addr           => dmem_addr_sig,
       data_in        => dmem_data_out_sig,
-      data_out       => dmem_data_in_sig);
+      data_out       => dmem_data_in_sig,
+		uart_txd 		=> dmem_txd_sig,
+		uart_rxd 		=> dmem_rxd_sig);
   
   rlu_unit : rlu port map(
     clk                 => clk,
@@ -449,5 +455,9 @@ begin  -- rise_rtl
 
   data_in_imem_sig      <= (others => '-');  -- unused at the moment
   wr_enable_imem_sig    <= '-';  -- unused at the moment
+  
+  --  ports of top level entity
+  tx 					<= dmem_txd_sig;
+  dmem_rxd_sig		<= rx;
   
 end rise_rtl;
