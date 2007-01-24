@@ -185,23 +185,66 @@ begin
   --   c:   18 31           add R3,#0x1
   --   e:   e0 31           st R3,[R1]
   --  10:   70 20           jmp R2  
-  
-  process (cur_pc)
-  begin
-    case cur_pc is
-      when x"0000" => if_id_register_next.ir <= x"8100";  -- ld R1,#0x0
-      when x"0002" => if_id_register_next.ir <= x"9110";  -- ldhb R1,#0x10
-      when x"0004" => if_id_register_next.ir <= x"e001";  -- st R0,[R1]
-      when x"0006" => if_id_register_next.ir <= x"820a";  -- ld R2,#0xa
-      when x"0008" => if_id_register_next.ir <= x"9200";  -- ldhb R2,#0x0
 
-      when x"000A" => if_id_register_next.ir <= x"a031";  -- ld R3,[R1]
-      when x"000C" => if_id_register_next.ir <= x"1831";  -- add R3,#0x1
-      when x"000E" => if_id_register_next.ir <= x"e031";  -- st R3,[R1]
-      when x"0010" => if_id_register_next.ir <= x"7020";  -- jmp R2  
-      when others  => if_id_register_next.ir <= x"0000";  -- nop
-    end case;
-  end process;  
+
+--     process (cur_pc)
+--     begin
+--       case cur_pc is
+--         when x"0000" => if_id_register_next.ir <= x"8100";  -- ld R1,#0x0
+--         when x"0002" => if_id_register_next.ir <= x"9110";  -- ldhb R1,#0x10
+--         when x"0004" => if_id_register_next.ir <= x"e001";  -- st R0,[R1]
+--         when x"0006" => if_id_register_next.ir <= x"820a";  -- ld R2,#0xa
+--         when x"0008" => if_id_register_next.ir <= x"9200";  -- ldhb R2,#0x0
+
+--         when x"000A" => if_id_register_next.ir <= x"a031";  -- ld R3,[R1]
+--         when x"000C" => if_id_register_next.ir <= x"1831";  -- add R3,#0x1
+--         when x"000E" => if_id_register_next.ir <= x"e031";  -- st R3,[R1]
+--         when x"0010" => if_id_register_next.ir <= x"7020";  -- jmp R2  
+--         when others  => if_id_register_next.ir <= x"0000";  -- nop
+--      end case;
+--    end process;
+
+
+  
+-- UART sample
+  
+    process (cur_pc)
+    begin
+      case cur_pc is
+        when x"0000" => if_id_register_next.ir <= x"8800";  -- ld R8,#0x0
+        when x"0002" => if_id_register_next.ir <= x"9880";  -- ldhb R8,#0x80
+        when x"0004" => if_id_register_next.ir <= x"8901";  -- ld R9,#0x1
+        when x"0006" => if_id_register_next.ir <= x"9980";  -- ldhb R9,#0x80
+        when x"0008" => if_id_register_next.ir <= x"8b10";  -- ld R11,#0x10
+
+        when x"000A" => if_id_register_next.ir <= x"9b00";  -- ldhb R11,#0x0
+       when x"000C" => if_id_register_next.ir <= x"8c1c";  -- ld R12,#0x1c
+        when x"000E" => if_id_register_next.ir <= x"9c00";  -- ldhb R12,#0x0
+        when x"0010" => if_id_register_next.ir <= x"70c0";  -- jmp R12 (test)
+
+                        --      when x"0010" => if_id_register_next.ir <= x"a028";  -- ld R2,[R8]
+
+        when x"0012" => if_id_register_next.ir <= x"8302";  -- ld R3,#0x2
+        when x"0014" => if_id_register_next.ir <= x"4823";  -- and R2,R3
+        when x"0016" => if_id_register_next.ir <= x"72b0";  -- jmpz R11
+        when x"0018" => if_id_register_next.ir <= x"a049";  -- ld R4,[R9]
+
+        when x"001A" => if_id_register_next.ir <= x"1841";  -- add R4,#0x1
+        when x"001C" => if_id_register_next.ir <= x"a028";  -- ld R2,[R8]
+        when x"001E" => if_id_register_next.ir <= x"8301";  -- ld R3,#0x1
+        when x"0020" => if_id_register_next.ir <= x"4823";  -- and R2,R3
+
+        when x"0022" => if_id_register_next.ir <= x"72c0";  -- jmpz R12
+
+        when x"0024" => if_id_register_next.ir <= x"8441";  --ld R4,#0x41 (test)
+
+        when x"0028" => if_id_register_next.ir <= x"e049";  -- st R4,[R9]
+                      
+        when others  => if_id_register_next.ir <= x"0000";  -- nop
+      end case;
+    end process;
+
+
 end if_state_behavioral;
 
 
