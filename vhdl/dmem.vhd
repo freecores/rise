@@ -9,7 +9,7 @@
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;
-use IEEE.STD_LOGIC_ARITH.all;
+use ieee.numeric_std.all;
 
 use WORK.RISE_PACK.all;
 
@@ -19,7 +19,6 @@ entity dmem is
   port (
     clk   : in std_logic;
     reset : in std_logic;
-
     wr_enable : in  std_logic;
     addr      : in  MEM_ADDR_T;
     data_in   : in  MEM_DATA_T;
@@ -40,6 +39,7 @@ architecture dmem_rtl of dmem is
       sinit : in  std_logic;
       we    : in  std_logic);
   end component;
+  
    component sc_uart is
       generic (ADDR_BITS : integer;
                CLK_FREQ  : integer;
@@ -54,7 +54,7 @@ architecture dmem_rtl of dmem is
             WR_DATA : in  std_logic_vector(15 downto 0);
             RD, WR  : in  std_logic;
             RD_DATA : out std_logic_vector(15 downto 0);
-            RDY_CNT : out IEEE.NUMERIC_STD.unsigned(1 downto 0);
+            RDY_CNT : out unsigned(1 downto 0);
             TXD     : out std_logic;
             RXD     : in  std_logic;
             NCTS    : in  std_logic;
@@ -62,19 +62,21 @@ architecture dmem_rtl of dmem is
     end component;
 
 
-     signal uart_address(1 downto 0): std_logic_vector(1 downto 0);
-      signal uart_wr_data :std_logic_vector(15 downto 0);
-      signal uart_rd : std_logic;
-      signal uart_wr : std_logic;
-      signal uart_rd_data: std_logic_vector(15 downto 0);
+     signal uart_address 		: std_logic_vector(1 downto 0);
+      signal uart_wr_data 		:std_logic_vector(15 downto 0);
+      signal uart_rd 			: std_logic;
+      signal uart_wr 			: std_logic;
+      signal uart_rd_data		: std_logic_vector(15 downto 0);
 
-      signal uart_txd_sig : std_logic;
-      signal uart_rxd_sig : std_logic;
+      signal uart_txd_sig 		: std_logic;
+      signal uart_rxd_sig 		: std_logic;
 		
 		signal mem_addr : std_logic_vector (11 downto 0);
 		signal mem_data_in :MEM_DATA_T;
       signal mem_data_out :MEM_DATA_T;
       signal mem_wr_enable:  std_logic;
+		
+		signal rdy_cnt_sig		: IEEE.NUMERIC_STD.unsigned(1 downto 0);
 begin  -- dmem_rtl
 
   -- Uart modul einbinden
@@ -95,7 +97,7 @@ begin  -- dmem_rtl
       RD      => uart_rd,
       WR      => uart_wr,
       RD_DATA => uart_rd_data,
-      RDY_CNT => open,
+      RDY_CNT => rdy_cnt_sig,
       TXD     => uart_txd_sig,
       RXD     => uart_rxd_sig,
       NCTS    => '0',
@@ -112,8 +114,8 @@ begin  -- dmem_rtl
       we    => mem_wr_enable);
 
 
-uart_txd <= uart_txd_sig;
-uart_rxd <= uart_rxd_sig;
+uart_txd 		<= uart_txd_sig;
+uart_rxd_sig 	<= uart_rxd;
 
 process (wr_enable, addr, data_in, uart_rd_data, mem_data_out)
 begin
@@ -139,7 +141,7 @@ else
 	mem_wr_enable <= wr_enable;
 end if;
 
-end process
+end process;
 
 end dmem_rtl;
 
