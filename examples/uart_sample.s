@@ -16,8 +16,6 @@
   ldhb    r11, addrhi(check_rdrf)
   ld      r12, addrlo(check_tdre)
   ldhb    r12, addrhi(check_tdre)
-
- jmp r12
 	
   /* wait for uart receiver data */
 check_rdrf: 
