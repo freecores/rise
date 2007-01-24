@@ -39,47 +39,14 @@ entity wb_stage is
     clear_reg_lock1 : out std_logic;
     lock_reg_addr1  : out REGISTER_ADDR_T);
 
+
 end wb_stage;
 
 architecture wb_stage_rtl of wb_stage is
-	signal address	:std_logic_vector(2 downto 0); 
-	signal wr_data	:std_logic_vector(15 downto 0);
-	signal rd		:std_logic;
-   signal wr		:std_logic;
-   signal rd_data	:std_logic_vector(15 downto 0);
-   signal rdy_cnt	:std_logic_vector(1 downto 0);
-   signal txd		:std_logic;
-   signal rxd		:std_logic;
-	signal sendtouart	:std_logic;
-		
-    component sc_uart is
-      generic (ADDR_BITS : integer;
-               CLK_FREQ  : integer;
-               BAUD_RATE : integer;
-               TXF_DEPTH : integer;
-               TXF_THRES : integer;
-               RXF_DEPTH : integer;
-               RXF_THRES : integer);
-      port (CLK     : in  std_logic;
-            RESET   : in  std_logic;
-            ADDRESS : in  std_logic_vector(addr_bits-1 downto 0);
-            WR_DATA : in  std_logic_vector(15 downto 0);
-            RD, WR  : in  std_logic;
-            RD_DATA : out std_logic_vector(15 downto 0);
-            RDY_CNT : out IEEE.NUMERIC_STD.unsigned(1 downto 0);
-            TXD     : out std_logic;
-            RXD     : in  std_logic;
-            NCTS    : in  std_logic;
-            NRTS    : out std_logic);
-    end component;
 
 begin  -- wb_stage_rtl
-		
-		
+
   clear_out <= '0';  -- clear_out output is unused at the moment.
-
-  
-
 
   process (reset, mem_wb_register)
   begin
@@ -96,7 +63,7 @@ begin  -- wb_stage_rtl
       lr        <= (others => 'X');
       sr_enable   <= '0';
       sr        <= (others => 'X');
-	 else
+    else
 
       -- write back of register value. --
       dreg_addr <= mem_wb_register.dreg_addr;
