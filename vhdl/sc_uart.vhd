@@ -141,7 +141,7 @@ begin
 process(clk, reset)
 begin
 
-	if (reset='1') then
+	if (reset='0') then
 		rd_data(7 downto 0) <= (others => '0');
 	elsif rising_edge(clk) then
 
@@ -172,7 +172,7 @@ process(clk, reset)
 	variable clkrx		: unsigned(3 downto 0);
 
 begin
-	if (reset='1') then
+	if (reset='0') then
 		clk16 := 0;
 		clktx := "0000";
 		clkrx := "0000";
@@ -241,7 +241,7 @@ process(clk, reset)
 
 begin
 
-	if (reset='1') then
+	if (reset='0') then
 		uart_tx_state <= s0;
 		tsr <= "1111111111";
 		tf_rd <= '0';
@@ -314,7 +314,7 @@ process(clk, reset)
 
 begin
 
-	if (reset='1') then
+	if (reset='0') then
 		uart_rx_state <= s0;
 		rsr <= "0000000000";
 		rf_wr <= '0';
