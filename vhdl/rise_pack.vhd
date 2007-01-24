@@ -16,6 +16,7 @@ use work.RISE_PACK_SPECIFIC.all;
 
 package RISE_PACK is
 
+  constant CLK_FREQ  : integer := 50000000;
   constant ARCHITECTURE_WIDTH : integer := 16;
   constant REGISTER_COUNT : integer := 16;
   
@@ -120,6 +121,6 @@ package RISE_PACK is
                             end record;
   
     constant CONST_UART_STATUS_ADDRESS: REGISTER_T := x"8000";
-	  constant CONST_UART_DATA_ADDRESS: REGISTER_T := x"8001";
+	 constant CONST_UART_DATA_ADDRESS: REGISTER_T := x"8001";
 end RISE_PACK;
 
