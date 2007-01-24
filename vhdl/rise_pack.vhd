@@ -119,8 +119,7 @@ package RISE_PACK is
                               sr            : SR_REGISTER_T;
                             end record;
   
-
-   constant CONST_ADDRESS: x"8001";
-
+    constant CONST_UART_STATUS_ADDRESS: REGISTER_T := x"8000";
+	  constant CONST_UART_DATA_ADDRESS: REGISTER_T := x"8001";
 end RISE_PACK;
 
