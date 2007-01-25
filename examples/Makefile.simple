@@ -3,7 +3,7 @@
 #
 # Copyright (c) 2006 Christian Walter, Vienna 2006.
 #
-# $Id: Makefile.simple,v 1.1 2007-01-25 21:20:06 cwalter Exp $
+# $Id: Makefile.simple,v 1.2 2007-01-25 22:52:58 cwalter Exp $
 #
 # ---------------------------------------------------------------------------
 
@@ -16,8 +16,8 @@ BIN2VHD     = bin2vhd
 ASFLAGS     =
 LDFLAGS	    = 
 
-TGT         = subroutine
-ASRC        = subroutine.s
+TGT         = uart_complex
+ASRC        = uart_complex.s
 OBJS        = $(ASRC:.s=.o)
 
 .PHONY: clean all
