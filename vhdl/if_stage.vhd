@@ -206,44 +206,79 @@ begin
 
 
   
--- UART sample
+-- UART sample 1
   
-    process (cur_pc)
+--     process (cur_pc)
+--     begin
+--       case cur_pc is
+--         when x"0000" => if_id_register_next.ir <= x"8800";  -- ld R8,#0x0
+--         when x"0002" => if_id_register_next.ir <= x"9880";  -- ldhb R8,#0x80
+--         when x"0004" => if_id_register_next.ir <= x"8901";  -- ld R9,#0x1
+--         when x"0006" => if_id_register_next.ir <= x"9980";  -- ldhb R9,#0x80
+--         when x"0008" => if_id_register_next.ir <= x"8b10";  -- ld R11,#0x10
+
+--         when x"000A" => if_id_register_next.ir <= x"9b00";  -- ldhb R11,#0x0
+--         when x"000C" => if_id_register_next.ir <= x"8c1c";  -- ld R12,#0x1c
+--         when x"000E" => if_id_register_next.ir <= x"9c00";  -- ldhb R12,#0x0
+--         when x"0010" => if_id_register_next.ir <= x"70c0";  -- jmp R12 (test)
+
+--         when x"0012" => if_id_register_next.ir <= x"8302";  -- ld R3,#0x2
+--         when x"0014" => if_id_register_next.ir <= x"4823";  -- and R2,R3
+--         when x"0016" => if_id_register_next.ir <= x"72b0";  -- jmpz R11
+--         when x"0018" => if_id_register_next.ir <= x"a049";  -- ld R4,[R9]
+
+--         when x"001A" => if_id_register_next.ir <= x"1841";  -- add R4,#0x1
+--         when x"001C" => if_id_register_next.ir <= x"a028";  -- ld R2,[R8]
+--         when x"001E" => if_id_register_next.ir <= x"8301";  -- ld R3,#0x1
+--         when x"0020" => if_id_register_next.ir <= x"4823";  -- and R2,R3
+
+--         when x"0022" => if_id_register_next.ir <= x"72c0";  -- jmpz R12
+
+--         when x"0024" => if_id_register_next.ir <= x"8441";  --ld R4,#0x41 (test)
+
+--         when x"0028" => if_id_register_next.ir <= x"e049";  -- st R4,[R9]
+
+--         when x"002A" => if_id_register_next.ir <= x"70c0";  -- jmp R12 (test)
+--         when others  => if_id_register_next.ir <= x"0000";  -- nop
+--       end case;
+--     end process;
+
+  process (cur_pc)
     begin
       case cur_pc is
+        -- initialisation
         when x"0000" => if_id_register_next.ir <= x"8800";  -- ld R8,#0x0
         when x"0002" => if_id_register_next.ir <= x"9880";  -- ldhb R8,#0x80
         when x"0004" => if_id_register_next.ir <= x"8901";  -- ld R9,#0x1
         when x"0006" => if_id_register_next.ir <= x"9980";  -- ldhb R9,#0x80
         when x"0008" => if_id_register_next.ir <= x"8b10";  -- ld R11,#0x10
-
         when x"000A" => if_id_register_next.ir <= x"9b00";  -- ldhb R11,#0x0
-       when x"000C" => if_id_register_next.ir <= x"8c1c";  -- ld R12,#0x1c
+        when x"000C" => if_id_register_next.ir <= x"8c1c";  -- ld R12,#0x1c
         when x"000E" => if_id_register_next.ir <= x"9c00";  -- ldhb R12,#0x0
-        when x"0010" => if_id_register_next.ir <= x"70c0";  -- jmp R12 (test)
 
-                        --      when x"0010" => if_id_register_next.ir <= x"a028";  -- ld R2,[R8]
-
+        -- check uart data available
+        when x"0010" => if_id_register_next.ir <= x"a028";  -- ld R2,[R8]
         when x"0012" => if_id_register_next.ir <= x"8302";  -- ld R3,#0x2
         when x"0014" => if_id_register_next.ir <= x"4823";  -- and R2,R3
         when x"0016" => if_id_register_next.ir <= x"72b0";  -- jmpz R11
-        when x"0018" => if_id_register_next.ir <= x"a049";  -- ld R4,[R9]
 
+        -- get add from uart, inc. by one
+        when x"0018" => if_id_register_next.ir <= x"a049";  -- ld R4,[R9]
         when x"001A" => if_id_register_next.ir <= x"1841";  -- add R4,#0x1
+
+        -- wait for uarts transmitter register empty
         when x"001C" => if_id_register_next.ir <= x"a028";  -- ld R2,[R8]
         when x"001E" => if_id_register_next.ir <= x"8301";  -- ld R3,#0x1
         when x"0020" => if_id_register_next.ir <= x"4823";  -- and R2,R3
-
         when x"0022" => if_id_register_next.ir <= x"72c0";  -- jmpz R12
 
-        when x"0024" => if_id_register_next.ir <= x"8441";  --ld R4,#0x41 (test)
+        -- send data
+        when x"0024" => if_id_register_next.ir <= x"e049";  -- st R4,[R9]
 
-        when x"0028" => if_id_register_next.ir <= x"e049";  -- st R4,[R9]
-                      
+        when x"0026" => if_id_register_next.ir <= x"70b0";  -- jmp R11
         when others  => if_id_register_next.ir <= x"0000";  -- nop
       end case;
     end process;
-
 
 end if_state_behavioral;
 
