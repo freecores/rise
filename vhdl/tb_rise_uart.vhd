@@ -88,8 +88,15 @@ begin
 
     wait for 20us;
 
+    -- send a 'CR' = 0x0A
     rx <= '0';                          -- 8 startbit
     wait for 8600ns;
+    rx <= '0';                          -- 8 datenbits
+    wait for 8600ns;
+    rx <= '1';                          -- 8 datenbits
+    wait for 8600ns;
+    rx <= '0';                          -- 8 datenbits
+    wait for 8600ns;
     rx <= '1';                          -- 8 datenbits
     wait for 8600ns;
     rx <= '0';                          -- 8 datenbits
@@ -97,12 +104,6 @@ begin
     rx <= '0';                          -- 8 datenbits
     wait for 8600ns;
     rx <= '0';                          -- 8 datenbits
-    wait for 8600ns;
-    rx <= '0';                          -- 8 datenbits
-    wait for 8600ns;
-    rx <= '1';                          -- 8 datenbits
-    wait for 8600ns;
-    rx <= '1';                          -- 8 datenbits
     wait for 8600ns;
     rx <= '0';                          -- 8 datenbits
     wait for 8600ns;
