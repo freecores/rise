@@ -145,6 +145,7 @@ begin  -- dmem_rtl
     mem_addr <= (others => '0');
     mem_data_in <= (others => '0');
     mem_wr_enable <= '0';
+	 uart_address <= (others => '0');
 
     uart_wr <= '0';
     uart_wr_data <= (others => '0');
@@ -157,7 +158,8 @@ begin  -- dmem_rtl
       -- accessing UART
 
       uart_address <= addr (1 downto 0);
-      if wr_enable = '1' then
+      
+		if wr_enable = '1' then
         uart_wr <= '1';
         uart_wr_data <= data_in;
       else
