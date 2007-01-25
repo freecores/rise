@@ -26,16 +26,20 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * File: $Id: subroutine.s,v 1.1 2007-01-25 20:32:15 cwalter Exp $
+ * File: $Id: subroutine.s,v 1.2 2007-01-25 21:20:06 cwalter Exp $
  */
 
     .text
-    .org    0x0000
-
-reset:
+    .global _start
+_start:
     ld      r12, addrlo(stack)
     ldhb    r12, addrhi(stack)
+    ld      r11, addrlo(func1)
+    ldhb    r11, addrhi(func1)
+    jmp     r11
+    jmp     r0
 
+    .org    0x0500
 func1:
     ld      pc, lr
 
