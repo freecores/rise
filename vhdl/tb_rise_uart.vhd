@@ -86,6 +86,8 @@ begin
     rx <= '1';                          -- 8 stopbit
     wait for 8600ns;
 
+    wait for 20us;
+
     rx <= '0';                          -- 8 startbit
     wait for 8600ns;
     rx <= '1';                          -- 8 datenbits
