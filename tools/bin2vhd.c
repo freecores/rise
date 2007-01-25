@@ -25,7 +25,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * File: $Id: bin2vhd.c,v 1.1 2007-01-25 20:32:30 cwalter Exp $
+ * File: $Id: bin2vhd.c,v 1.2 2007-01-25 21:08:25 cwalter Exp $
  */
 
 #include <stdio.h>
@@ -36,11 +36,11 @@
 #include <assert.h>
 
 #define PROGNAME                "bin2vhd"
-#define VHDL_ENTITY_NAME 				"pgrom"
-#define VHDL_ARCHITECTURE_NAME 	"pgrom_rtl"
+#define VHDL_ENTITY_NAME        "pgrom"
+#define VHDL_ARCHITECTURE_NAME  "pgrom_rtl"
 
-#define ADDRESS_BITS						16
-#define DATA_BITS								16
+#define ADDRESS_BITS            16
+#define DATA_BITS               16
 #define IS_SYNCHRONOUS          0
 #define PC_INCREMENT            2
 
@@ -115,7 +115,7 @@ vPrintUsage(  )
 void
 vWriteEntity( FILE * pxOutputFile )
 {
-    fprintf( pxOutputFile, "libary IEEE;\n" );
+    fprintf( pxOutputFile, "library IEEE;\n" );
     fprintf( pxOutputFile, "use IEEE.STD_LOGIC_1164.all;\n" );
     fprintf( pxOutputFile, "use IEEE.NUMERIC_STD.all;\n" );
     fprintf( pxOutputFile, "entity %s is\n", VHDL_ENTITY_NAME );
@@ -123,7 +123,7 @@ vWriteEntity( FILE * pxOutputFile )
     fprintf( pxOutputFile, "  clk   : in std_logic;\n" );
     fprintf( pxOutputFile, "  addr  : in std_logic_vector(%d downto 0 );\n", ( ADDRESS_BITS - 1 ) );
     fprintf( pxOutputFile, "  data  : out std_logic_vector(%d downto 0 ) );\n", ( DATA_BITS - 1 ) );
-    fprintf( pxOutputFile, ")\n" );
+    fprintf( pxOutputFile, "end %s;\n", VHDL_ENTITY_NAME );
     fprintf( pxOutputFile, "\n" );
 }
 
@@ -131,24 +131,24 @@ void
 vWriteArchitectureHeader( FILE * pxOutputFile )
 {
     fprintf( pxOutputFile, "architecture %s of %s is\n", VHDL_ARCHITECTURE_NAME, VHDL_ENTITY_NAME );
-    fprintf( pxOutputFile, "  signal data_next :  std_logic_vector(%d downto 0 ) );\n",
+    fprintf( pxOutputFile, "  signal sig_data_next :  std_logic_vector(%d downto 0 );\n",
              ( DATA_BITS - 1 ) );
     if( IS_SYNCHRONOUS )
     {
-        fprintf( pxOutputFile, "  signal data_int :  std_logic_vector(%d downto 0 ) );\n",
+        fprintf( pxOutputFile, "  signal sig_data_int :  std_logic_vector(%d downto 0 ) );\n",
                  ( DATA_BITS - 1 ) );
         fprintf( pxOutputFile, "begin\n" );
-        fprintf( pxOutputFile, "  data <= signal_data_int\n" );
+        fprintf( pxOutputFile, "  data <= sig_data_int\n" );
         fprintf( pxOutputFile, "process (clk)\n" );
         fprintf( pxOutputFile, "  if clk'event and clk = '1' then\n" );
-        fprintf( pxOutputFile, "    signal_data_int <= signal_data_next;\n" );
+        fprintf( pxOutputFile, "    sig_data_int <= sig_data_next;\n" );
         fprintf( pxOutputFile, "  end if;\n" );
         fprintf( pxOutputFile, "end process;\n" );
     }
     else
     {
         fprintf( pxOutputFile, "begin\n" );
-        fprintf( pxOutputFile, "  data <= signal_data_next\n" );
+        fprintf( pxOutputFile, "  data <= sig_data_next;\n" );
     }
     fprintf( pxOutputFile, "\n" );
     fprintf( pxOutputFile, "  process( addr )\n" );
@@ -169,7 +169,7 @@ vWriteArchitectureData( FILE * pxOutputFile, const unsigned char *pucData, int i
         {
             sprintf( &arucBuffer[i], "%02X", pucData[iBytePos] );
         }
-        fprintf( pxOutputFile, "      when x\"%s\" => signal_data_next <= x\"%*s\"\n",
+        fprintf( pxOutputFile, "      when x\"%s\" => sig_data_next <= x\"%*s\";\n",
                  pcAddress2Hex( uiProgrammCounter ), DATA_BITS / 4, arucBuffer );
         uiProgrammCounter += PC_INCREMENT;
     }
@@ -178,11 +178,11 @@ vWriteArchitectureData( FILE * pxOutputFile, const unsigned char *pucData, int i
 void
 vWriteArchitectureFooter( FILE * pxOutputFile )
 {
-    fprintf( pxOutputFile, "      when others  => signal_data_next <= ( others => '0' );\n" );
+    fprintf( pxOutputFile, "      when others  => sig_data_next <= ( others => '0' );\n" );
     fprintf( pxOutputFile, "    end case;\n" );
     fprintf( pxOutputFile, "  end process;\n" );
     fprintf( pxOutputFile, "\n" );
-    fprintf( pxOutputFile, "end %s", VHDL_ARCHITECTURE_NAME );
+    fprintf( pxOutputFile, "end %s;", VHDL_ARCHITECTURE_NAME );
 }
 
 const char     *
