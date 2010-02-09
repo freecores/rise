@@ -12,9 +12,10 @@ use IEEE.STD_LOGIC_1164.all;
 use ieee.numeric_std.all;
 
 use WORK.RISE_PACK.all;
+use WORK.CONF_PACK.all;
 
 
-entity dmem is
+entity memctrl is
   
   port (
     clk   : in std_logic;
@@ -26,18 +27,17 @@ entity dmem is
     uart_txd : out std_logic;
     uart_rxd : in std_logic);
 
-end dmem;
+end memctrl;
 
-architecture dmem_rtl of dmem is
+architecture memctrl_rtl of memctrl is
 
-  component idmem
+  component dmem
     port (
-      addr  : in  std_logic_vector(11 downto 0);
+      addr  : in  std_logic_vector(DMEM_ADDR_WIDTH-1 downto 0);
       clk   : in  std_logic;
-      din   : in  std_logic_vector(15 downto 0);
-      dout  : out std_logic_vector(15 downto 0);
-      sinit : in  std_logic;
-      we    : in  std_logic);
+      data_in   : in  MEM_DATA_T;
+      data_out  : out MEM_DATA_T;
+      wr_enable : in  std_logic);
   end component;
   
   component sc_uart is
@@ -107,7 +107,7 @@ begin  -- dmem_rtl
       NRTS    => open
       );
 
-  DATA_MEM : idmem
+  DATA_MEM : dmem
     port map (
       addr  => mem_addr,
       clk   => clk,
@@ -174,7 +174,7 @@ begin  -- dmem_rtl
 
   end process;
 
-end dmem_rtl;
+end memctrl_rtl;
 
 
 

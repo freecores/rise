@@ -16,7 +16,6 @@ use work.RISE_PACK_SPECIFIC.all;
 
 package RISE_PACK is
 
-  constant CLK_FREQ  : integer := 50000000;
   constant ARCHITECTURE_WIDTH : integer := 16;
   constant REGISTER_COUNT : integer := 16;
   
